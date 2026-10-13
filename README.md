@@ -140,13 +140,14 @@ Hasil verifikasi:
    PASS  Tests\Feature\AdminManagementTest (6 tests)
    PASS  Tests\Feature\AuthenticationTest (8 tests)
    PASS  Tests\Feature\AuthorizationRoleTest (4 tests)
+   PASS  Tests\Feature\DemonstrationWalkthroughTest (5 tests)
    PASS  Tests\Feature\ErrorHandlingAndEmptyStateTest (5 tests)
    PASS  Tests\Feature\PermintaanDarahWorkflowTest (7 tests)
    PASS  Tests\Feature\PetugasDonorCrudTest (5 tests)
    PASS  Tests\Unit\StokDarahTest (2 tests)
 
-   Tests:    37 passed (116 assertions)
-   Duration: 8.15s
+   Tests:    42 passed (169 assertions)
+   Duration: 12.61s
 ```
 
 ---
