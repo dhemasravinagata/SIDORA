@@ -8,15 +8,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/global.css">
-    <link rel="stylesheet" href="assets/css/pages/dashboard.css">
+    <link rel="stylesheet" href="assets/css/global.css?v=1780743553">
+    <link rel="stylesheet" href="assets/css/pages/dashboard.css?v=1780742032">
     </head>
 <body>
     <div class="dashboard-layout">
-        <nav class="navbar">
+        <nav class="navbar dashboard-header">
             <div class="navbar-left">
                 <button class="navbar-toggle" id="sidebarToggle"></button>
-                <span class="navbar-brand">SIDORA Petugas</span>
+                <a href="index.php" class="navbar-logo"><img src="assets/img/logo-sidora.png" alt="SIDORA" class="navbar-logo-img"></a>
             </div>
             <div class="navbar-right">
                 <div class="navbar-user">
@@ -46,16 +46,13 @@
                 </li>
                 <li class="sidebar-menu-item">
                     <a href="index.php?page=petugas-riwayat-donasi" class="sidebar-menu-link active">
-                        
-                        
-<i data-lucide="file-text"></i> <span>Riwayat Donasi</span>
+                        <i data-lucide="file-text"></i> <span>Riwayat Donasi</span>
                     </a>
                 </li>
+                <li class="sidebar-title">INFORMASI</li>
                 <li class="sidebar-menu-item">
                     <a href="index.php?page=petugas-jadwal-donor" class="sidebar-menu-link">
-                        
-                        
-<i data-lucide="calendar"></i> <span>Jadwal Donor</span>
+                        <i data-lucide="calendar"></i> <span>Jadwal Donor</span>
                     </a>
                 </li>
                 <li class="sidebar-menu-item">
@@ -196,7 +193,7 @@
 
                 <div style="display: flex; gap: var(--spacing-md); justify-content: flex-end;">
                     <a href="index.php?page=petugas-riwayat-donasi" class="btn btn-outline-gray" style="text-decoration:none;"><i data-lucide="arrow-left"></i> <span>Batal</span></a>
-                    <button type="submit" class="btn btn-primary-sidora">Simpan Riwayat</button>
+                    <button type="submit" class="btn btn-primary-sidora"><i data-lucide="save"></i> <span>Simpan Riwayat</span></button>
                 </div>
             </form>
         </main>

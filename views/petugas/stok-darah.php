@@ -8,8 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/global.css">
-    <link rel="stylesheet" href="assets/css/pages/dashboard.css">
+    <link rel="stylesheet" href="assets/css/global.css?v=1780743553">
+    <link rel="stylesheet" href="assets/css/pages/dashboard.css?v=1780742032">
     <style>
         .stok-grid {
             display: grid;
@@ -56,10 +56,10 @@
     </head>
 <body>
     <div class="dashboard-layout">
-        <nav class="navbar">
+        <nav class="navbar dashboard-header">
             <div class="navbar-left">
                 <button class="navbar-toggle" id="sidebarToggle"></button>
-                <span class="navbar-brand">SIDORA Petugas</span>
+                <a href="index.php" class="navbar-logo"><img src="assets/img/logo-sidora.png" alt="SIDORA" class="navbar-logo-img"></a>
             </div>
             <div class="navbar-right">
                 <div class="navbar-user">
@@ -184,11 +184,11 @@
                     <div>
                         <span class="badge <?= $level ?>">
                             <?php if ($level === 'badge-success'): ?>
-                                Aman
+                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg> Aman
                             <?php elseif ($level === 'badge-warning'): ?>
-                                Rendah
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Rendah
                             <?php else: ?>
-                                Kritis
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Kritis
                             <?php endif; ?>
                         </span>
                     </div>
@@ -201,54 +201,55 @@
 
     
     <div class="modal" id="detailStokModal">
-        <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-content">
             <div class="modal-header">
                 <h2>Detail Stok</h2>
-                <button class="modal-close" onclick="closeModal('detailStokModal')">&times;</button>
+                <button type="button" class="modal-close" onclick="closeModal('detailStokModal')">&times;</button>
             </div>
-            <div class="modal-body">
-                <div style="display: grid; grid-template-columns: 150px 1fr; gap: 10px; margin-bottom: 10px;">
-                    <strong>Golongan Darah:</strong> <span id="dtl-gol"></span>
-                    <strong>Stok Tersedia:</strong> <span id="dtl-qty"></span>
-                    <strong>Status:</strong> <span id="dtl-status" class="badge"></span>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline-gray" onclick="closeModal('detailStokModal')"><i data-lucide="x"></i> <span>Tutup</span></button>
+            <div class="modal-body" id="detailStokBody">
+                
             </div>
         </div>
     </div>
 
     <style>
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; overflow-y: auto; }
-    .modal.active { display: flex; }
-    .modal-content { background: white; border-radius: 8px; width: 90%; margin: auto; }
-    .modal-header { padding: 16px; border-bottom: 1px solid 
-    .modal-body { padding: 16px; max-height: 70vh; overflow-y: auto; }
-    .modal-footer { padding: 16px; border-top: 1px solid 
+
     .badge { display: inline-block; padding: 0.35rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; }
     </style>
 
     <script>
         function openDetailStokModal(gol, qty) {
-            document.getElementById('dtl-gol').textContent = gol;
-            document.getElementById('dtl-qty').textContent = qty + ' kantong';
-            
-            let statusEl = document.getElementById('dtl-status');
+            let statusText = '';
+            let statusClass = '';
             if (qty >= 80) { 
-                statusEl.textContent = 'Aman';
-                statusEl.style.backgroundColor = '#dcfce7';
-                statusEl.style.color = '#166534';
+                statusText = 'Aman';
+                statusClass = 'badge-success';
             } else if (qty >= 50) {
-                statusEl.textContent = 'Rendah';
-                statusEl.style.backgroundColor = '#fef3c7';
-                statusEl.style.color = '#92400e';
+                statusText = 'Rendah';
+                statusClass = 'badge-warning';
             } else {
-                statusEl.textContent = 'Kritis';
-                statusEl.style.backgroundColor = '#fee2e2';
-                statusEl.style.color = '#991b1b';
+                statusText = 'Kritis';
+                statusClass = 'badge-danger';
             }
 
+            let html = `
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <p class="detail-label">Golongan Darah</p>
+                        <p class="detail-value">${gol}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Stok Tersedia</p>
+                        <p class="detail-value">${qty} kantong</p>
+                    </div>
+                    <div class="detail-item full-width">
+                        <p class="detail-label">Status</p>
+                        <p class="detail-value"><span class="badge ${statusClass}">${statusText}</span></p>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('detailStokBody').innerHTML = html;
             document.getElementById('detailStokModal').classList.add('active');
         }
 

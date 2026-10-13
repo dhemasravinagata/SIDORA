@@ -1,10 +1,6 @@
 
 
 
-
-
-
-
 function openModal(modalId, permintaanId = null) {
     const modal = document.getElementById(modalId);
     if (!modal) return;

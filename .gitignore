@@ -1,0 +1,14 @@
+/.env
+/.env.backup
+/.env.production
+/vendor/
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitkeep
+/storage/framework/views/*
+!/storage/framework/views/.gitkeep
+/storage/framework/cache/*
+!/storage/framework/cache/.gitkeep
+/storage/logs/*.log
+!/storage/logs/.gitkeep
+/.phpunit.result.cache
+.phpunit.cache

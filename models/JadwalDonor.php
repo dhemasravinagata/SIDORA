@@ -21,14 +21,14 @@ class JadwalDonor
     public function create($data)
     {
         global $pdo;
-        $stmt = $pdo->prepare('INSERT INTO jadwal_donor (lokasi, tanggal, target) VALUES (:lokasi, :tanggal, :target)');
+        $stmt = $pdo->prepare('INSERT INTO jadwal_donor (lokasi, tanggal, target, waktu_mulai, waktu_selesai, status, catatan) VALUES (:lokasi, :tanggal, :target, :waktu_mulai, :waktu_selesai, :status, :catatan)');
         return $stmt->execute($data);
     }
 
     public function update($id, $data)
     {
         global $pdo;
-        $stmt = $pdo->prepare('UPDATE jadwal_donor SET lokasi = :lokasi, tanggal = :tanggal, target = :target WHERE id = :id');
+        $stmt = $pdo->prepare('UPDATE jadwal_donor SET lokasi = :lokasi, tanggal = :tanggal, target = :target, waktu_mulai = :waktu_mulai, waktu_selesai = :waktu_selesai, status = :status, catatan = :catatan WHERE id = :id');
         $data['id'] = $id;
         return $stmt->execute($data);
     }

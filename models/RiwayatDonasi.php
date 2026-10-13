@@ -6,7 +6,7 @@ class RiwayatDonasi
     public function getAll()
     {
         global $pdo;
-        $stmt = $pdo->query('SELECT r.*, p.nama AS nama_pendonor FROM riwayat_donasi r LEFT JOIN pendonor p ON r.pendonor_id = p.id ORDER BY r.created_at DESC');
+        $stmt = $pdo->query('SELECT r.*, p.nama AS nama_pendonor, p.nik, p.jenis_kelamin, p.tanggal_lahir, p.telepon, p.alamat, p.pekerjaan FROM riwayat_donasi r LEFT JOIN pendonor p ON r.pendonor_id = p.id ORDER BY r.created_at DESC');
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 

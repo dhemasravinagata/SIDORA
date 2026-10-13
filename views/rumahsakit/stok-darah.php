@@ -8,8 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/global.css">
-    <link rel="stylesheet" href="assets/css/pages/dashboard.css">
+    <link rel="stylesheet" href="assets/css/global.css?v=1780743553">
+    <link rel="stylesheet" href="assets/css/pages/dashboard.css?v=1780742032">
     <style>
         .filter-section {
             background: white;
@@ -40,11 +40,10 @@
             background: white;
             border: 1px solid var(--border-color);
             border-radius: var(--border-radius);
-            padding: var(--spacing-lg);
+            padding: var(--spacing-lg) 2rem;
             box-shadow: var(--shadow);
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: var(--spacing-lg);
+            display: flex;
+            justify-content: space-between;
             align-items: center;
         }
 
@@ -77,30 +76,32 @@
             font-size: 1.2rem;
         }
 
-        .blood-o-plus { background: linear-gradient(135deg, 
-        .blood-o-minus { background: linear-gradient(135deg, 
-        .blood-a-plus { background: linear-gradient(135deg, 
-        .blood-a-minus { background: linear-gradient(135deg, 
-        .blood-b-plus { background: linear-gradient(135deg, 
-        .blood-b-minus { background: linear-gradient(135deg, 
-        .blood-ab-plus { background: linear-gradient(135deg, 
-        .blood-ab-minus { background: linear-gradient(135deg, 
+        .blood-o-plus { background: linear-gradient(135deg, #dc2626, #991b1b); }
+        .blood-o-minus { background: linear-gradient(135deg, #ea580c, #c2410c); }
+        .blood-a-plus { background: linear-gradient(135deg, #2563eb, #1e40af); }
+        .blood-a-minus { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+        .blood-b-plus { background: linear-gradient(135deg, #059669, #047857); }
+        .blood-b-minus { background: linear-gradient(135deg, #0891b2, #0e7490); }
+        .blood-ab-plus { background: linear-gradient(135deg, #f97316, #ea580c); }
+        .blood-ab-minus { background: linear-gradient(135deg, #d97706, #b45309); }
 
 
 
         @media (max-width: 768px) {
             .stock-card {
-                grid-template-columns: 1fr;
+                flex-direction: column;
+                text-align: center;
+                gap: var(--spacing-lg);
             }
         }
     </style>
     </head>
 <body>
     <div class="dashboard-layout">
-        <nav class="navbar">
+        <nav class="navbar dashboard-header">
             <div class="navbar-left">
                 <button class="navbar-toggle" id="sidebarToggle"></button>
-                <span class="navbar-brand">SIDORA Rumah Sakit</span>
+                <a href="index.php" class="navbar-logo"><img src="assets/img/logo-sidora.png" alt="SIDORA" class="navbar-logo-img"></a>
             </div>
 
             <div class="navbar-right">
@@ -243,7 +244,7 @@ Data stok darah diperbarui secara real-time. Hubungi layanan donor untuk keterse
                         <h3><?= $golongan . $rh ?> (<?= $golongan ?> <?= $rh == '+' ? 'Positif' : 'Negatif' ?>)</h3>
                         <p>Stok Tersedia: <strong style="color: var(--dark-gray);"><?= $jumlah ?> kantong</strong></p>
                         <span class="badge badge-status <?= $statusClass ?>" style="margin-top: var(--spacing-md);">
-<?= $statusText ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><?= $statusIcon ?></svg> <?= $statusText ?>
                         </span>
                     </div>
                     <div class="stock-visual">

@@ -8,17 +8,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/global.css">
-    <link rel="stylesheet" href="assets/css/pages/dashboard.css">
+    <link rel="stylesheet" href="assets/css/global.css?v=1780743553">
+    <link rel="stylesheet" href="assets/css/pages/dashboard.css?v=1780742032">
     <style>
-        .form-section {
-            background: white;
-            border-radius: var(--border-radius);
-            padding: var(--spacing-lg);
-            box-shadow: var(--shadow);
-            max-width: 700px;
-            margin: 0 auto;
-        }
+
 
         .form-row {
             display: grid;
@@ -51,14 +44,14 @@
         }
 
         .blood-type-btn:hover {
-            border-color: var(--primary-color);
-            background-color: 
+            border-color: var(--color-primary);
+            background-color: var(--color-primary-soft);
         }
 
         .blood-type-btn.selected {
-            background-color: var(--primary-color);
+            background-color: var(--color-primary);
             color: white;
-            border-color: var(--primary-color);
+            border-color: var(--color-primary);
         }
 
         .quantity-input {
@@ -85,6 +78,16 @@
         .quantity-input input {
             width: 60px;
             text-align: center;
+        }
+        
+        .quantity-input input::-webkit-outer-spin-button,
+        .quantity-input input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        .quantity-input input[type=number] {
+            -moz-appearance: textfield;
         }
 
         .request-summary {
@@ -115,18 +118,18 @@
         }
 
         .alert-info {
-            background: 
-            border: 1px solid 
-            color: 
+            background: #cffafe;
+            border: 1px solid #a5f3fc;
+            color: #164e63;
             padding: var(--spacing-md);
             border-radius: var(--border-radius);
             margin-bottom: var(--spacing-lg);
         }
 
         .alert-warning {
-            background: 
-            border: 1px solid 
-            color: 
+            background: #fef3c7;
+            border: 1px solid #fde68a;
+            color: #92400e;
             padding: var(--spacing-md);
             border-radius: var(--border-radius);
             margin-bottom: var(--spacing-lg);
@@ -145,7 +148,7 @@
 
         .file-upload-box:hover {
             border-color: var(--primary-color);
-            background: 
+            background: #fff5f5;
         }
 
         .file-upload-box input[type="file"] {
@@ -180,10 +183,10 @@
     </head>
 <body>
     <div class="dashboard-layout">
-        <nav class="navbar">
+        <nav class="navbar dashboard-header">
             <div class="navbar-left">
                 <button class="navbar-toggle" id="sidebarToggle"></button>
-                <span class="navbar-brand">SIDORA Rumah Sakit</span>
+                <a href="index.php" class="navbar-logo"><img src="assets/img/logo-sidora.png" alt="SIDORA" class="navbar-logo-img"></a>
             </div>
 
             <div class="navbar-right">
@@ -268,20 +271,30 @@
                 </div>
             </div>
 
-            <div class="form-section">
-                <?php if (isset($_SESSION['error'])): ?>
-                <div class="alert-warning">
-<?= htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?>
-                </div>
-                <?php endif; ?>
+            <?php render_alerts(); ?>
 
-                <div class="alert-info">
+            <div class="alert-info" style="margin-bottom: var(--spacing-lg);">
 Permintaan darah Anda akan diproses maksimal 24 jam. Silakan hubungi kami jika ada pertanyaan.
-                </div>
+            </div>
 
-                <form id="permintaanForm" action="index.php?page=rs-permintaan-store" method="POST">
-                    <h3>Informasi Pasien</h3>
-                    
+            <form id="permintaanForm" action="index.php?page=rs-permintaan-store" method="POST" class="card">
+                    <h3 style="margin-top: 0;"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;margin-right:8px;"><circle cx="12" cy="12" r="10"/><polyline points="12 16 16 12 12 8"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Tujuan Permintaan</h3>
+                    <div class="form-group" style="margin-bottom: var(--spacing-lg);">
+                        <div style="display: flex; gap: var(--spacing-lg);">
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="tujuan_permintaan" value="pasien" checked onchange="toggleTujuan()">
+                                <span>Khusus Pasien (Cito/Crossmatching)</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="tujuan_permintaan" value="stok" onchange="toggleTujuan()">
+                                <span>Penambahan Stok BDRS (Dropping)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="informasiPasienSection">
+                        <hr style="margin: var(--spacing-2xl) 0; border: none; border-top: 1px solid var(--border-color);">
+                        <h3><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;margin-right:8px;"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>Informasi Pasien</h3>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="namaPasien" class="required">Nama Pasien</label>
@@ -294,19 +307,21 @@ Permintaan darah Anda akan diproses maksimal 24 jam. Silakan hubungi kami jika a
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="ruangan" class="required">Ruangan/Dept.</label>
-                            <input type="text" id="ruangan" name="ruangan" class="form-control" required>
-                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="ruangan" class="required">Ruangan/Dept.</label>
+                                <input type="text" id="ruangan" name="ruangan" class="form-control" required>
+                            </div>
 
-                        <div class="form-group">
-                            <label for="dokter" class="required">Dokter Penanggungjawab</label>
-                            <input type="text" id="dokter" name="dokter" class="form-control" required>
+                            <div class="form-group">
+                                <label for="dokter" class="required">Dokter Penanggungjawab</label>
+                                <input type="text" id="dokter" name="dokter" class="form-control" required>
+                            </div>
                         </div>
                     </div>
 
-                    <h3 style="margin-top: var(--spacing-2xl); margin-bottom: var(--spacing-lg);">Jenis Darah yang Dibutuhkan</h3>
+                    <hr style="margin: var(--spacing-2xl) 0; border: none; border-top: 1px solid var(--border-color);">
+                    <h3 style="margin-bottom: var(--spacing-lg);"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;margin-right:8px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Jenis Darah yang Dibutuhkan</h3>
 
                     <p style="font-size: 0.95rem; color: var(--gray); margin-bottom: var(--spacing-md);">Pilih golongan darah yang Anda butuhkan:</p>
 
@@ -328,7 +343,7 @@ Permintaan darah Anda akan diproses maksimal 24 jam. Silakan hubungi kami jika a
                         <label for="jumlah" class="required">Jumlah Kantong Darah</label>
                         <div class="quantity-input">
                             <button type="button" class="quantity-btn" onclick="decreaseQuantity()">-</button>
-                            <input type="number" id="jumlah" name="jumlah" value="1" min="1" max="100" readonly class="form-control" style="width: 80px;">
+                            <input type="number" id="jumlah" name="jumlah" value="1" min="1" max="100" class="form-control" style="width: 80px;" oninput="updateSummaryQty(this.value)" onchange="this.value = Math.max(1, Math.min(100, parseInt(this.value) || 1)); updateSummaryQty(this.value);">
                             <button type="button" class="quantity-btn" onclick="increaseQuantity()">+</button>
                         </div>
                     </div>
@@ -348,14 +363,8 @@ Permintaan darah Anda akan diproses maksimal 24 jam. Silakan hubungi kami jika a
                         </select>
                     </div>
 
-                    <div class="form-group">
-                        <label>Surat Permintaan Resmi (PDF/Image)</label>
-                        <input type="file" name="surat_permintaan" id="suratInput" accept=".pdf,.jpg,.jpeg,.png" style="display:block; width:100%; padding:8px; border:1px solid var(--border-color); border-radius:var(--border-radius); background:white; font-family:inherit; font-size:0.9rem;">
-                        <small class="text-muted" style="margin-top:4px; display:block;">Opsional, namun disarankan untuk meningkatkan proses verifikasi</small>
-                    </div>
-
-                    <div class="request-summary">
-                        <h4 style="margin-top: 0; color: var(--dark-gray);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> Ringkasan Permintaan</h4>
+                    <div style="background: #e0f2fe; border-left: 4px solid var(--primary-color); padding: var(--spacing-lg); border-radius: var(--border-radius); margin: var(--spacing-xl) 0;">
+                        <h4 style="margin-top: 0; color: var(--dark-gray); display:flex; align-items:center; gap:8px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg> Ringkasan Permintaan</h4>
                         <div class="summary-item">
                             <span>Golongan Darah:</span>
                             <strong id="summaryBlood">-</strong>
@@ -364,19 +373,18 @@ Permintaan darah Anda akan diproses maksimal 24 jam. Silakan hubungi kami jika a
                             <span>Jumlah Kantong:</span>
                             <strong id="summaryQty">1 Kantong</strong>
                         </div>
-                        <div class="summary-item">
+                        <div class="summary-item" style="border-bottom: none;">
                             <span>Prioritas:</span>
                             <strong id="summaryPriority">-</strong>
                         </div>
                     </div>
 
                     <div style="display: flex; gap: var(--spacing-md); margin-top: var(--spacing-2xl);">
-                        <button type="reset" class="btn btn-outline" style="flex: 1;">Bersihkan Form</button>
-                        <button type="submit" class="btn btn-primary-sidora" style="flex: 1;">Ajukan Permintaan
+                        <button type="reset" class="btn btn-outline" style="flex: 1;"><i data-lucide="rotate-ccw"></i> <span>Bersihkan Form</span></button>
+                        <button type="submit" class="btn btn-primary-sidora" style="flex: 1;"><i data-lucide="send"></i> <span>Ajukan Permintaan</span>
                         </button>
                     </div>
                 </form>
-            </div>
         </main>
     </div>
     
@@ -387,6 +395,23 @@ Permintaan darah Anda akan diproses maksimal 24 jam. Silakan hubungi kami jika a
             document.getElementById('selectedGolongan').value = gol;
             document.getElementById('selectedRhesus').value = rh;
             document.getElementById('summaryBlood').textContent = gol + rh;
+        }
+
+        function toggleTujuan() {
+            const isStok = document.querySelector('input[name="tujuan_permintaan"]:checked').value === 'stok';
+            const pasienSection = document.getElementById('informasiPasienSection');
+            const inputs = pasienSection.querySelectorAll('input');
+            
+            if (isStok) {
+                pasienSection.style.display = 'none';
+                inputs.forEach(input => {
+                    input.required = false;
+                    input.value = ''; 
+                });
+            } else {
+                pasienSection.style.display = 'block';
+                inputs.forEach(input => input.required = true);
+            }
         }
 
         function decreaseQuantity() {

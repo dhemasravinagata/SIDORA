@@ -1,8 +1,3 @@
-<?php
-
-$error = $_SESSION['error'] ?? null;
-unset($_SESSION['error']);
-?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -12,29 +7,33 @@ unset($_SESSION['error']);
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/global.css">
-    <link rel="stylesheet" href="assets/css/auth.css">
+    <link rel="stylesheet" href="assets/css/global.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="assets/css/auth.css?v=<?= time() ?>">
 </head>
 <body class="auth-page">
+
+    <?php render_alerts(); ?>
 
     <div class="auth-container">
         <div class="auth-box">
             <div class="auth-header">
-                <div class="logo">
-</div>
-                <h1>SIDORA</h1>
-                <p class="subtitle">Sistem Informasi Donor Darah</p>
+                <div class="auth-logo" aria-label="SIDORA" style="margin-bottom: 8px;">
+                    <span class="auth-logo-mask"></span>
+                </div>
+                <div style="text-align: center; font-size: 14px; color: #4B5563; margin-bottom: 24px; font-weight: 500; font-family: 'Poppins', sans-serif;">
+                    Sistem Informasi Donor Darah
+                </div>
             </div>
 
-            <?php if ($error): ?>
-                <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
-            <?php endif; ?>
-
             <form class="login-form" id="loginForm" method="POST" action="index.php?page=login-process">
+                <?= csrf_field() ?>
+
                 <div class="form-group">
                     <label for="email" class="required">Username atau Email</label>
-                    <input type="text" id="email" name="email" placeholder="Masukkan username atau email" required>
-                    <span class="error" id="usernameError"></span>
+                    <input type="text" id="email" name="email" value="<?= htmlspecialchars(old('email')) ?>" placeholder="Masukkan username atau email" required autofocus>
+                    <?php if (has_error('email')): ?>
+                        <span class="error" style="color:#DC2626;font-size:0.8rem;display:block;margin-top:4px;"><?= htmlspecialchars(error('email')) ?></span>
+                    <?php endif; ?>
                 </div>
 
                 <div class="form-group">
@@ -46,54 +45,48 @@ unset($_SESSION['error']);
                             <i data-lucide="eye-off" id="iconEyeOff" style="display:none;"></i>
                         </button>
                     </div>
-                    <span class="error" id="passwordError"></span>
+                    <?php if (has_error('password')): ?>
+                        <span class="error" style="color:#DC2626;font-size:0.8rem;display:block;margin-top:4px;"><?= htmlspecialchars(error('password')) ?></span>
+                    <?php endif; ?>
                 </div>
 
                 <div class="form-group form-check">
-                    <input type="checkbox" id="rememberMe">
+                    <input type="checkbox" id="rememberMe" name="remember_me">
                     <label for="rememberMe" style="margin-bottom:0;font-weight:normal;">Ingat saya</label>
                 </div>
 
-                <button type="submit" class="btn btn-primary-sidora btn-login" style="width: 100%;"><i data-lucide="log-in"></i> <span>Login</span></button>
+                <button type="submit" class="btn btn-primary-sidora btn-login" style="width: 100%;">
+                    <i data-lucide="log-in"></i> <span>Login</span>
+                </button>
             </form>
 
             <div class="auth-footer">
                 <p class="text-muted">Belum punya akun? <a href="index.php?page=register-rs">Daftar sebagai Rumah Sakit</a></p>
-                <p class="text-muted"><a href="#">Lupa password?</a></p>
             </div>
         </div>
-
-        <div class="auth-side">
-            <div class="side-content">
-                <h2>Selamat Datang di SIDORA</h2>
-                <p>Sistem Informasi Manajemen Donor Darah yang modern dan terintegrasi.</p>
-                <div class="features">
-                    <div class="feature-item">
-                        <span class="feature-icon"><i data-lucide="check"></i></span>
-                        <span>Pengelolaan data pendonor terpadu</span>
-                    </div>
-                    <div class="feature-item">
-                        <span class="feature-icon"><i data-lucide="check"></i></span>
-                        <span>Monitoring stok darah real-time</span>
-                    </div>
-                    <div class="feature-item">
-                        <span class="feature-icon"><i data-lucide="check"></i></span>
-                        <span>Proses permintaan darah yang efisien</span>
-                    </div>
-                    <div class="feature-item">
-                        <span class="feature-icon"><i data-lucide="check"></i></span>
-                        <span>Jadwal donor yang terorganisir</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </div>
-    <script src="assets/js/auth.js"></script>
 
     <script src="assets/vendor/lucide/lucide.min.js"></script>
-    <script>lucide.createIcons();</script>
+    <script>
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+
+        const toggleBtn = document.getElementById('togglePassword');
+        const pwdInput = document.getElementById('password');
+        const iconEye = document.getElementById('iconEye');
+        const iconEyeOff = document.getElementById('iconEyeOff');
+
+        if (toggleBtn && pwdInput) {
+            toggleBtn.addEventListener('click', function () {
+                const isPassword = pwdInput.type === 'password';
+                pwdInput.type = isPassword ? 'text' : 'password';
+                if (iconEye && iconEyeOff) {
+                    iconEye.style.display = isPassword ? 'none' : 'inline-block';
+                    iconEyeOff.style.display = isPassword ? 'inline-block' : 'none';
+                }
+            });
+        }
+    </script>
 </body>
 </html>
-
-

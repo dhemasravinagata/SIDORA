@@ -8,42 +8,19 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/global.css">
-    <link rel="stylesheet" href="assets/css/pages/dashboard.css">
+    <link rel="stylesheet" href="assets/css/global.css?v=1780743553">
+    <link rel="stylesheet" href="assets/css/pages/dashboard.css?v=1780742032">
     <style>
-        .filter-section {
-            background: white;
-            padding: var(--spacing-lg);
-            border-radius: var(--border-radius);
-            margin-bottom: var(--spacing-lg);
-            display: flex;
-            gap: var(--spacing-md);
-            flex-wrap: wrap;
-            align-items: flex-end;
-        }
 
-        .filter-group {
-            flex: 1;
-            min-width: 150px;
-        }
-
-        .filter-group label {
-            margin-bottom: var(--spacing-sm);
-        }
-
-        .filter-group input,
-        .filter-group select {
-            width: 100%;
-        }
 
     </style>
     </head>
 <body>
     <div class="dashboard-layout">
-        <nav class="navbar">
+        <nav class="navbar dashboard-header">
             <div class="navbar-left">
                 <button class="navbar-toggle" id="sidebarToggle"></button>
-                <span class="navbar-brand">SIDORA Admin</span>
+                <a href="index.php" class="navbar-logo"><img src="assets/img/logo-sidora.png" alt="SIDORA" class="navbar-logo-img"></a>
             </div>
 
             <div class="navbar-right">
@@ -67,7 +44,7 @@
                 
                 <li class="sidebar-menu-item">
                     <a href="index.php?page=admin-kelola-petugas" class="sidebar-menu-link">
-                        <i data-lucide="users"></i> <span>Kelola Petugas</span>
+                        <i data-lucide="users"></i> <span>Kelola User</span>
                     </a>
                 </li>
 
@@ -119,57 +96,52 @@
                 </div>
             </div>
 
-            <form action="index.php" method="GET" class="filter-section">
-                <input type="hidden" name="page" value="admin-daftar-pendonor">
+            <div class="card filter-card">
                 <div class="filter-group" style="flex: 2; min-width: 200px;">
                     <label for="searchPendonor">Cari Pendonor</label>
-                    <input type="text" id="searchPendonor" name="search" placeholder="Nama, No. Identitas, No. Telepon..." value="<?= htmlspecialchars($_GET['search'] ?? '') ?>">
+                    <input type="text" id="searchPendonor" placeholder="Nama, No. Identitas, No. Telepon...">
                 </div>
 
                 <div class="filter-group">
                     <label for="filterGolDarah">Golongan Darah</label>
-                    <select id="filterGolDarah" name="golongan">
+                    <select id="filterGolDarah">
                         <option value="">Semua</option>
-                        <option value="A" <?= (isset($_GET['golongan']) && $_GET['golongan'] == 'A') ? 'selected' : '' ?>>A</option>
-                        <option value="B" <?= (isset($_GET['golongan']) && $_GET['golongan'] == 'B') ? 'selected' : '' ?>>B</option>
-                        <option value="AB" <?= (isset($_GET['golongan']) && $_GET['golongan'] == 'AB') ? 'selected' : '' ?>>AB</option>
-                        <option value="O" <?= (isset($_GET['golongan']) && $_GET['golongan'] == 'O') ? 'selected' : '' ?>>O</option>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="AB">AB</option>
+                        <option value="O">O</option>
                     </select>
                 </div>
 
                 <div class="filter-group">
                     <label for="filterStatus">Status</label>
-                    <select id="filterStatus" name="status">
+                    <select id="filterStatus">
                         <option value="">Semua Status</option>
-                        <option value="aktif" <?= (isset($_GET['status']) && $_GET['status'] == 'aktif') ? 'selected' : '' ?>>Aktif</option>
-                        <option value="nonaktif" <?= (isset($_GET['status']) && $_GET['status'] == 'nonaktif') ? 'selected' : '' ?>>Non-aktif</option>
+                        <option value="aktif">Aktif</option>
+                        <option value="nonaktif">Non-aktif</option>
                     </select>
                 </div>
 
-                <button type="submit" class="btn btn-outline-sidora"><i data-lucide="funnel"></i> <span>Filter</span></button>
-            </form>
+                <button class="btn btn-outline-gray" id="resetBtn"><i data-lucide="rotate-ccw"></i> <span>Reset</span></button>
+            </div>
 
             <div class="table-container">
                 <div class="table-header">
                     <h3>Data Pendonor Terdaftar</h3>
                     <div class="table-actions">
-                        <button class="btn btn-outline btn-outline-sidora"><i data-lucide="file-output"></i> <span>Export</span></button>
+                        <button class="btn btn-outline btn-outline-sidora" id="exportBtn"><i data-lucide="file-output"></i> <span>Export</span></button>
                     </div>
                 </div>
 
                 <div class="table-wrapper">
-                    <table>
+                    <table id="tabelPendonor">
                         <thead>
                             <tr>
                                 <th>No</th>
                                 <th>Nama Lengkap</th>
-                                <th>No. Identitas</th>
-                                <th>Jenis Kelamin</th>
-                                <th>Golongan Darah</th>
-                                <th>Rhesus</th>
+                                <th>Gol. Darah</th>
                                 <th>No. Telepon</th>
                                 <th>Status</th>
-                                <th>Terakhir Donor</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
@@ -177,32 +149,25 @@
                             <?php if (!empty($pendonorList)): $no = 1; foreach ($pendonorList as $pendonor): ?>
                                 <?php 
                                     $gol = $pendonor['golongan'] ?? '';
-                                    $bgCol = 'transparent'; $txCol = '#000';
-                                    if($gol == 'O') { $bgCol = '#dcfce7'; $txCol = '#166534'; }
-                                    elseif($gol == 'A') { $bgCol = '#fee2e2'; $txCol = '#991b1b'; }
-                                    elseif($gol == 'B') { $bgCol = '#cffafe'; $txCol = '#164e63'; }
-                                    elseif($gol == 'AB') { $bgCol = '#e0e7ff'; $txCol = '#3730a3'; }
                                 ?>
                                 <tr>
                                     <td><?= $no++ ?></td>
                                     <td><?= htmlspecialchars(!empty($pendonor['nama']) ? $pendonor['nama'] : '-') ?></td>
-                                    <td><?= htmlspecialchars(!empty($pendonor['nik']) ? $pendonor['nik'] : '-') ?></td>
-                                    <td><?= htmlspecialchars(!empty($pendonor['jenis_kelamin']) ? $pendonor['jenis_kelamin'] : '-') ?></td>
-                                    <td><span style="background: <?= $bgCol ?>; padding: 4px 10px; border-radius: 4px; color: <?= $txCol ?>; font-weight: 600; font-size: 12px;"><?= htmlspecialchars(!empty($pendonor['golongan']) ? $pendonor['golongan'] : '-') ?></span></td>
-                                    <td><?= htmlspecialchars(!empty($pendonor['rhesus']) ? $pendonor['rhesus'] : '-') ?></td>
+                                    <td><?= htmlspecialchars((!empty($pendonor['golongan']) ? $pendonor['golongan'] : '-') . (!empty($pendonor['rhesus']) ? $pendonor['rhesus'] : '')) ?></td>
                                     <td><?= htmlspecialchars(!empty($pendonor['telepon']) ? $pendonor['telepon'] : '-') ?></td>
                                     <td>
                                         <?php if((!empty($pendonor['status']) && $pendonor['status']=='aktif') || (!isset($pendonor['status']))): ?>
-                                            <span class="badge badge-success">Aktif</span>
+                                            <span class="badge badge-success"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg> Aktif</span>
                                         <?php else: ?>
-                                            <span class="badge badge-warning">Non-aktif</span>
+                                            <span class="badge badge-warning"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Non-aktif</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td><?= htmlspecialchars(!empty($pendonor['terakhir_donor']) ? $pendonor['terakhir_donor'] : (!empty($pendonor['tgl_donor']) ? $pendonor['tgl_donor'] : '-')) ?></td>
                                     <td>
-                                        <button class="btn btn-outline-sidora btn-small" onclick='openDetailPendonorModal(<?= htmlspecialchars(json_encode($pendonor), ENT_QUOTES, "UTF-8") ?>)'>
-                                            <i data-lucide="eye"></i> <span>Detail</span>
-                                        </button>
+                                        <div class="action-buttons">
+                                            <button class="btn btn-outline-sidora btn-small" onclick='openDetailPendonorModal(<?= htmlspecialchars(json_encode($pendonor), ENT_QUOTES, "UTF-8") ?>)'>
+                                                <i data-lucide="eye"></i> <span>Detail</span>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             <?php endforeach; else: ?>
@@ -219,44 +184,68 @@
 
     
     <div class="modal" id="detailPendonorModal">
-        <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-content">
             <div class="modal-header">
                 <h2>Detail Pendonor</h2>
-                <button class="modal-close" onclick="closeModal('detailPendonorModal')">&times;</button>
+                <button type="button" class="modal-close" onclick="closeModal('detailPendonorModal')">&times;</button>
             </div>
             <div class="modal-body">
-                <div style="display: grid; grid-template-columns: 150px 1fr; gap: 10px; margin-bottom: 10px;" id="pendonorDetailContent">
+                <div id="pendonorDetailContent">
                     
                 </div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline-gray" onclick="closeModal('detailPendonorModal')"><i data-lucide="x"></i> <span>Tutup</span></button>
-            </div>
         </div>
     </div>
-    
-    <style>
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; overflow-y: auto; }
-    .modal.active { display: flex; }
-    .modal-content { background: white; border-radius: 8px; width: 90%; margin: auto; }
-    .modal-header { padding: 16px; border-bottom: 1px solid 
-    .modal-body { padding: 16px; max-height: 70vh; overflow-y: auto; }
-    .modal-footer { padding: 16px; border-top: 1px solid 
-    </style>
 
     <script>
         function openDetailPendonorModal(data) {
             const html = `
-                <strong>Nama Lengkap:</strong> <span>${data.nama || '-'}</span>
-                <strong>No. Identitas:</strong> <span>${data.nik || '-'}</span>
-                <strong>Jenis Kelamin:</strong> <span>${data.jenis_kelamin || '-'}</span>
-                <strong>Tanggal Lahir:</strong> <span>${data.tanggal_lahir || data.tgl_lahir || '-'}</span>
-                <strong>Gol. Darah:</strong> <span>${data.golongan || '-'}${data.rhesus || ''}</span>
-                <strong>No. Telepon:</strong> <span>${data.telepon || '-'}</span>
-                <strong>Alamat:</strong> <span>${data.alamat || '-'}</span>
-                <strong>Status:</strong> <span>${data.status || 'Aktif'}</span>
-                <strong>Terakhir Donor:</strong> <span>${data.terakhir_donor || data.tgl_donor || '-'}</span>
-                <strong>Riwayat Donor:</strong> <span>${data.riwayat_donor || '-'}</span>
+                <div class="detail-grid">
+                    <div class="detail-item full-width">
+                        <p class="detail-label">Nama Lengkap</p>
+                        <p class="detail-value">${data.nama || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">No. Identitas (NIK)</p>
+                        <p class="detail-value">${data.nik || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Jenis Kelamin</p>
+                        <p class="detail-value">${data.jenis_kelamin || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Tanggal Lahir</p>
+                        <p class="detail-value">${data.tanggal_lahir || data.tgl_lahir || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Golongan Darah</p>
+                        <p class="detail-value">${data.golongan || '-'}${data.rhesus || ''}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">No. Telepon</p>
+                        <p class="detail-value">${data.telepon || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Pekerjaan</p>
+                        <p class="detail-value">${data.pekerjaan || '-'}</p>
+                    </div>
+                    <div class="detail-item full-width">
+                        <p class="detail-label">Alamat Lengkap</p>
+                        <p class="detail-value">${data.alamat || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Status</p>
+                        <p class="detail-value"><span class="badge ${(!data.status || data.status === 'aktif') ? 'badge-success' : 'badge-warning'}">${data.status || 'Aktif'}</span></p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Terakhir Donor</p>
+                        <p class="detail-value">${data.terakhir_donor || data.tgl_donor || '-'}</p>
+                    </div>
+                    <div class="detail-item full-width">
+                        <p class="detail-label">Riwayat Donor Tambahan</p>
+                        <p class="detail-value">${data.riwayat_donor || 'Belum ada catatan'}</p>
+                    </div>
+                </div>
             `;
             document.getElementById('pendonorDetailContent').innerHTML = html;
             document.getElementById('detailPendonorModal').classList.add('active');
@@ -264,7 +253,66 @@
         function closeModal(id) {
             document.getElementById(id).classList.remove('active');
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchPendonor');
+            const golSelect = document.getElementById('filterGolDarah');
+            const statusSelect = document.getElementById('filterStatus');
+            const resetBtn = document.getElementById('resetBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            const tableBody = document.querySelector('#tabelPendonor tbody');
+            const rows = tableBody.querySelectorAll('tr');
+            
+            function filterTable() {
+                const searchVal = searchInput.value.toLowerCase().trim();
+                const golVal = golSelect.value.toLowerCase();
+                const statusVal = statusSelect.value.toLowerCase();
+                
+                rows.forEach(row => {
+                    if(row.cells.length <= 1) return;
+                    
+                    const text = row.textContent.toLowerCase();
+                    // Col 3 = Golongan Darah (index 2)
+                    const golCell = row.cells[2];
+                    const golText = golCell ? golCell.textContent.toLowerCase().trim() : '';
+                    
+                    // Status Badge
+                    const statusBadge = row.querySelector('.badge');
+                    const statusText = statusBadge ? statusBadge.textContent.toLowerCase().trim() : '';
+                    
+                    const matchSearch = searchVal === '' || text.includes(searchVal);
+                    const matchGol = golVal === '' || golText === golVal;
+                    const matchStatus = statusVal === '' || statusText === statusVal || (statusVal === 'nonaktif' && statusText === 'non-aktif');
+                    
+                    row.style.display = (matchSearch && matchGol && matchStatus) ? '' : 'none';
+                });
+            }
+            
+            if(searchInput) searchInput.addEventListener('input', filterTable);
+            if(golSelect) golSelect.addEventListener('change', filterTable);
+            if(statusSelect) statusSelect.addEventListener('change', filterTable);
+            
+            if(resetBtn) {
+                resetBtn.addEventListener('click', function() {
+                    searchInput.value = '';
+                    golSelect.value = '';
+                    statusSelect.value = '';
+                    filterTable();
+                });
+            }
+
+            if(exportBtn) {
+                exportBtn.addEventListener('click', function() {
+                    if(typeof exportTableToCSV === 'function') {
+                        exportTableToCSV('tabelPendonor', 'Data_Daftar_Pendonor.csv');
+                    } else {
+                        alert('Fungsi export belum dimuat. Pastikan file table-actions.js terhubung.');
+                    }
+                });
+            }
+        });
     </script>
+    <script src="assets/js/table-actions.js?v=1780743555"></script>
     <script src="assets/js/sidebar.js"></script>
 
     <script src="assets/vendor/lucide/lucide.min.js"></script>

@@ -8,15 +8,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/global.css">
-    <link rel="stylesheet" href="assets/css/pages/dashboard.css">
+    <link rel="stylesheet" href="assets/css/global.css?v=1780743553">
+    <link rel="stylesheet" href="assets/css/pages/dashboard.css?v=1780742032">
     </head>
 <body>
     <div class="dashboard-layout">
-        <nav class="navbar">
+        <nav class="navbar dashboard-header">
             <div class="navbar-left">
                 <button class="navbar-toggle" id="sidebarToggle"></button>
-                <span class="navbar-brand">SIDORA Admin</span>
+                <a href="index.php" class="navbar-logo"><img src="assets/img/logo-sidora.png" alt="SIDORA" class="navbar-logo-img"></a>
             </div>
             <div class="navbar-right">
                 <div class="navbar-user">
@@ -37,7 +37,7 @@
                 <li class="sidebar-title">MANAJEMEN DATA</li>
                 <li class="sidebar-menu-item">
                     <a href="index.php?page=admin-kelola-petugas" class="sidebar-menu-link">
-                        <i data-lucide="users"></i> <span>Kelola Petugas</span>
+                        <i data-lucide="users"></i> <span>Kelola User</span>
                     </a>
                 </li>
                 <li class="sidebar-menu-item">
@@ -93,8 +93,23 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Deskripsi Kegiatan</label>
-                    <textarea name="deskripsi" class="form-control" rows="3" placeholder="Deskripsi lengkap tentang kegiatan donor darah..."></textarea>
+                    <label>Status Kegiatan *</label>
+                    <select name="status" class="form-control" required>
+                        <option value="Akan Datang">Akan Datang</option>
+                        <option value="Sedang Berlangsung">Sedang Berlangsung</option>
+                        <option value="Selesai">Selesai</option>
+                        <option value="Dibatalkan">Dibatalkan</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Deskripsi / Catatan Kegiatan</label>
+                    <textarea name="catatan" class="form-control" rows="3" placeholder="Deskripsi lengkap atau catatan tentang kegiatan donor darah..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Target Kantong Darah *</label>
+                    <input type="number" name="target" class="form-control" placeholder="Contoh: 100" min="1" required>
                 </div>
 
                 <hr style="margin: var(--spacing-2xl) 0; border: none; border-top: 1px solid var(--border-color);">
@@ -152,7 +167,7 @@
 
                 <div style="display: flex; gap: var(--spacing-md); justify-content: flex-end;">
                     <button type="button" onclick="window.history.back()" class="btn btn-outline-gray"><i data-lucide="x"></i> <span>Batal</span></button>
-                    <button type="submit" class="btn btn-primary-sidora">Simpan Jadwal</button>
+                    <button type="submit" class="btn btn-primary-sidora"><i data-lucide="save"></i> <span>Simpan Jadwal</span></button>
                 </div>
             </form>
         </main>

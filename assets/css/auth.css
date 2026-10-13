@@ -1,5 +1,5 @@
 .auth-page {
-  background: linear-gradient(135deg, 
+  background: linear-gradient(135deg, #8E1616 0%, #D84040 100%);
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -122,9 +122,14 @@
 .btn-login {
   width: 100%;
   height: 44px;
-  font-size: 1.05rem;
+  font-size: 13px;
   font-weight: 600;
   box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+}
+
+.btn-login i {
+  width: 15px;
+  height: 15px;
 }
 
 .btn-login:hover {
@@ -265,4 +270,93 @@
   .login-form .form-group {
     margin-bottom: var(--spacing-md);
   }
+}
+
+
+.auth-logo,
+.form-logo {
+display: flex;
+justify-content: center;
+align-items: center;
+margin-bottom: 20px;
+color: #1F2937;
+opacity: 1;
+position: relative;
+}
+
+.auth-logo-mask,
+.form-logo-mask {
+width: 170px;
+height: 42px;
+display: block;
+background-color: #1F2937;
+opacity: 1;
+
+-webkit-mask-image: url("../img/logo-sidora.png");
+-webkit-mask-repeat: no-repeat;
+-webkit-mask-position: center;
+-webkit-mask-size: contain;
+
+mask-image: url("../img/logo-sidora.png");
+mask-repeat: no-repeat;
+mask-position: center;
+mask-size: contain;
+}
+
+
+.auth-logo,
+.form-logo {
+display: flex;
+justify-content: center;
+align-items: center;
+margin-bottom: 20px;
+color: #1F2937;
+opacity: 1;
+position: relative;
+}
+
+.auth-logo-mask,
+.form-logo-mask {
+width: 170px;
+height: 42px;
+display: block;
+background-color: #1F2937;
+opacity: 1;
+
+-webkit-mask-image: url("../img/logo-sidora.png");
+-webkit-mask-repeat: no-repeat;
+-webkit-mask-position: center;
+-webkit-mask-size: contain;
+
+mask-image: url("../img/logo-sidora.png");
+mask-repeat: no-repeat;
+mask-position: center;
+mask-size: contain;
+}
+
+
+.auth-box input[type="text"], .auth-box input[type="email"], .auth-box input[type="password"], .auth-box textarea {
+    border: 1px solid #9CA3AF !important;
+}
+
+
+
+.auth-footer p {
+    font-size: 14px !important;
+    color: #4B5563 !important;
+    font-weight: 500 !important;
+    font-family: 'Poppins', sans-serif !important;
+    margin-bottom: 8px !important;
+}
+
+.auth-footer a {
+    color: #8E1616 !important; 
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    transition: all 0.3s ease;
+}
+
+.auth-footer a:hover {
+    color: #D84040 !important;
+    text-decoration: underline !important;
 }

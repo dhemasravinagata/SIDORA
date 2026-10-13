@@ -8,8 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/global.css">
-    <link rel="stylesheet" href="assets/css/pages/dashboard.css">
+    <link rel="stylesheet" href="assets/css/global.css?v=1780743553">
+    <link rel="stylesheet" href="assets/css/pages/dashboard.css?v=1780742032">
     <style>
 
 
@@ -35,10 +35,10 @@
 <body>
     <div class="dashboard-layout">
         
-        <nav class="navbar">
+        <nav class="navbar dashboard-header">
             <div class="navbar-left">
                 <button class="navbar-toggle" id="sidebarToggle"></button>
-                <span class="navbar-brand">SIDORA Rumah Sakit</span>
+                <a href="index.php" class="navbar-logo"><img src="assets/img/logo-sidora.png" alt="SIDORA" class="navbar-logo-img"></a>
             </div>
 
             <div class="navbar-right">
@@ -128,7 +128,7 @@
                 <div class="stat-card">
                     <div class="stat-content">
                         <h3>Total Permintaan</h3>
-                        <p class="stat-value">-</p>
+                        <p class="stat-value"><?= number_format((int)($statistics['total_permintaan'] ?? 0)) ?></p>
                         <div class="stat-change positive">
 Semua Waktu
                         </div>
@@ -140,7 +140,7 @@ Semua Waktu
                 <div class="stat-card">
                     <div class="stat-content">
                         <h3>Permintaan Ditinjau</h3>
-                        <p class="stat-value">-</p>
+                        <p class="stat-value"><?= number_format((int)($statistics['permintaan_ditinjau'] ?? 0)) ?></p>
                         <div class="stat-change negative">
 Menunggu Persetujuan
                         </div>
@@ -150,7 +150,7 @@ Menunggu Persetujuan
                 <div class="stat-card">
                     <div class="stat-content">
                         <h3>Disetujui</h3>
-                        <p class="stat-value">-</p>
+                        <p class="stat-value"><?= number_format((int)($statistics['disetujui'] ?? 0)) ?></p>
                         <div class="stat-change positive">
 Berhasil
                         </div>
@@ -161,7 +161,7 @@ Berhasil
                 <div class="stat-card">
                     <div class="stat-content">
                         <h3>Permintaan Ditolak</h3>
-                        <p class="stat-value">-</p>
+                        <p class="stat-value"><?= number_format((int)($statistics['permintaan_ditolak'] ?? 0)) ?></p>
                         <div class="stat-change negative">
 Tidak Tersedia
                         </div>
@@ -170,16 +170,36 @@ Tidak Tersedia
                 </div>
             </div>
 
-            <div class="card mb-3" style="display: flex; gap: var(--spacing-md); padding: var(--spacing-lg);">
-                <button class="btn btn-primary-sidora" onclick="window.location.href='index.php?page=rs-permintaan'">Ajukan Permintaan Darah
-                </button>
-                <button class="btn btn-outline" onclick="window.location.href='index.php?page=rs-history-permintaan'">Lihat Riwayat
-                </button>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-lg); margin-bottom: var(--spacing-2xl);">
+                <div class="card" style="text-align: center; cursor: pointer; transition: var(--transition);" onmouseover="this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.boxShadow='var(--shadow)'" onclick="window.location.href='index.php?page=rs-permintaan'">
+                    <div style="font-size: 2.5rem; margin-bottom: var(--spacing-md);"><i data-lucide="file-plus" style="width: 36px; height: 36px; display:inline-block; vertical-align:middle; flex-shrink:0; color:var(--primary-color);"></i></div>
+                    <h3 style="margin: 0; font-size: 1.1rem;">Ajukan Permintaan</h3>
+                    <p style="color: var(--text-muted); margin: var(--spacing-sm) 0 0 0;">Buat permintaan darah</p>
+                </div>
+
+                <div class="card" style="text-align: center; cursor: pointer; transition: var(--transition);" onmouseover="this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.boxShadow='var(--shadow)'" onclick="window.location.href='index.php?page=rs-history-permintaan'">
+                    <div style="font-size: 2.5rem; margin-bottom: var(--spacing-md);"><i data-lucide="file-text" style="width: 36px; height: 36px; display:inline-block; vertical-align:middle; flex-shrink:0; color:#d97706;"></i></div>
+                    <h3 style="margin: 0; font-size: 1.1rem;">Riwayat Permintaan</h3>
+                    <p style="color: var(--text-muted); margin: var(--spacing-sm) 0 0 0;">Cek status pengajuan</p>
+                </div>
+
+                <div class="card" style="text-align: center; cursor: pointer; transition: var(--transition);" onmouseover="this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.boxShadow='var(--shadow)'" onclick="window.location.href='index.php?page=rs-stok-darah'">
+                    <div style="font-size: 2.5rem; margin-bottom: var(--spacing-md);"><i data-lucide="droplet" style="width: 36px; height: 36px; display:inline-block; vertical-align:middle; flex-shrink:0; color:#dc2626;"></i></div>
+                    <h3 style="margin: 0; font-size: 1.1rem;">Stok Darah</h3>
+                    <p style="color: var(--text-muted); margin: var(--spacing-sm) 0 0 0;">Lihat ketersediaan</p>
+                </div>
+
+                <div class="card" style="text-align: center; cursor: pointer; transition: var(--transition);" onmouseover="this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.boxShadow='var(--shadow)'" onclick="window.location.href='index.php?page=rs-profil'">
+                    <div style="font-size: 2.5rem; margin-bottom: var(--spacing-md);"><i data-lucide="user" style="width: 36px; height: 36px; display:inline-block; vertical-align:middle; flex-shrink:0; color:#16a34a;"></i></div>
+                    <h3 style="margin: 0; font-size: 1.1rem;">Profil RS</h3>
+                    <p style="color: var(--text-muted); margin: var(--spacing-sm) 0 0 0;">Kelola data instansi</p>
+                </div>
             </div>
 
             <div class="table-container">
                 <div class="table-header">
                     <h3>Permintaan Darah Terbaru</h3>
+                    <a href="index.php?page=rs-history-permintaan" class="btn btn-outline btn-small"><span>Lihat Semua</span> <i data-lucide="arrow-right"></i></a>
                 </div>
 
                 <div class="table-wrapper">
@@ -202,25 +222,43 @@ Tidak Tersedia
                                     if ($status == 'Disetujui' || $status == 'Dikirim') $statusClass = 'badge-success';
                                     elseif ($status == 'Ditolak') $statusClass = 'badge-danger';
                                     
-                                    
-                                    $details = json_encode([
+                                    $detailPermintaan = [
+                                        'id' => $item['id'] ?? '',
+                                        'tanggal' => $item['created_at'] ?? '-',
+                                        'golongan' => $item['golongan'] ?? '-',
+                                        'rhesus' => $item['rhesus'] ?? '',
+                                        'jumlah' => $item['detail_jumlah'] ?? $item['jumlah'] ?? 0,
+                                        'status' => $status,
                                         'keterangan' => $item['keterangan'] ?? '-',
                                         'prioritas' => $item['prioritas'] ?? '-',
                                         'alasan_tolak' => $item['alasan_tolak'] ?? '-',
                                         'tanggal_tolak' => $item['tanggal_tolak'] ?? '-',
                                         'kurir' => $item['kurir'] ?? '-',
-                                        'tanggal_kirim' => $item['tanggal_kirim'] ?? '-'
-                                    ]);
+                                        'tanggal_kirim' => $item['tanggal_kirim'] ?? '-',
+                                    ];
                                 ?>
                                 <tr>
                                     <td><?= $no++ ?></td>
                                     <td><?= htmlspecialchars(date('d M Y', strtotime($item['created_at']))) ?></td>
                                     <td><strong><?= htmlspecialchars($item['golongan'] ?? '-') ?> <?= htmlspecialchars($item['rhesus'] ?? '') ?></strong></td>
                                     <td><?= htmlspecialchars($item['detail_jumlah'] ?? $item['jumlah'] ?? '0') ?> Kantong</td>
-                                    <td><span class="badge <?= $statusClass ?>"><?= htmlspecialchars($status) ?></span></td>
                                     <td>
-                                        <button class="btn btn-outline btn-small" onclick='openDetailPermintaanModal(<?= htmlspecialchars(json_encode($item), ENT_QUOTES, "UTF-8") ?>)'>
-Detail
+                                        <span class="badge <?= $statusClass ?>">
+                                            <?php if ($status === 'Disetujui'): ?>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
+                                            <?php elseif ($status === 'Ditolak'): ?>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                            <?php elseif ($status === 'Dikirim'): ?>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                                            <?php else: ?>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                            <?php endif; ?>
+                                            <?= htmlspecialchars($status) ?>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-outline-sidora btn-small" onclick='openDetailPermintaanModal(<?= htmlspecialchars(json_encode($detailPermintaan), ENT_QUOTES, "UTF-8") ?>)'>
+                                            <i data-lucide="eye"></i> <span>Detail</span>
                                         </button>
                                     </td>
                                 </tr>
@@ -245,31 +283,16 @@ Detail
 
     
     <div class="modal" id="detailPermintaanModal">
-        <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-content">
             <div class="modal-header">
                 <h2>Detail Permintaan Darah</h2>
-                <button class="modal-close" onclick="closeModal('detailPermintaanModal')">&times;</button>
+                <button type="button" class="modal-close" onclick="closeModal('detailPermintaanModal')">&times;</button>
             </div>
             <div class="modal-body" id="detailBodyRS">
                 
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline-gray" onclick="closeModal('detailPermintaanModal')"><i data-lucide="x"></i> <span>Tutup</span></button>
-            </div>
         </div>
     </div>
-
-    <style>
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; overflow-y: auto; }
-    .modal.active { display: flex; }
-    .modal-content { background: white; border-radius: 8px; width: 90%; margin: auto; }
-    .modal-header { padding: 16px; border-bottom: 1px solid 
-    .modal-body { padding: 16px; max-height: 70vh; overflow-y: auto; }
-    .modal-footer { padding: 16px; border-top: 1px solid 
-    .detail-row { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid 
-    .detail-label { font-weight: 600; color: 
-
-    </style>
 
     <script>
         function openDetailPermintaanModal(data) {
@@ -277,20 +300,55 @@ Detail
             if(data.status === 'Disetujui' || data.status === 'Dikirim') statusClass = 'badge-success';
             else if(data.status === 'Ditolak') statusClass = 'badge-danger';
 
+            const rawPrio = (data.prioritas || 'biasa').toLowerCase().trim();
+            let displayPrio = 'Biasa';
+            if(rawPrio === 'darurat' || rawPrio === 'tinggi') displayPrio = 'Darurat';
+            else if(rawPrio === 'segera' || rawPrio === 'sedang') displayPrio = 'Segera';
+
             let html = `
-                <div class="detail-row"><span class="detail-label">Golongan Darah</span>${data.golongan || '-'} ${data.rhesus || ''}</div>
-                <div class="detail-row"><span class="detail-label">Jumlah Kantong</span>${data.jumlah || 0} Kantong</div>
-                <div class="detail-row"><span class="detail-label">Status</span><span class="badge ${statusClass}">${data.status || 'Pending'}</span></div>
-                <div class="detail-row"><span class="detail-label">Keterangan / Prioritas</span>${data.keterangan || '-'} (Prioritas: ${data.prioritas || '-'})</div>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <p class="detail-label">Golongan Darah</p>
+                        <p class="detail-value">${data.golongan || '-'} ${data.rhesus || ''}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Jumlah Kantong</p>
+                        <p class="detail-value">${data.jumlah || 0} Kantong</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Status</p>
+                        <p class="detail-value"><span class="badge ${statusClass}">${data.status || 'Pending'}</span></p>
+                    </div>
+                    <div class="detail-item full-width">
+                        <p class="detail-label">Keterangan / Prioritas</p>
+                        <p class="detail-value">${data.keterangan || '-'} (Prioritas: ${displayPrio})</p>
+                    </div>
             `;
             
             if (data.status === 'Ditolak') {
-                html += `<div class="detail-row"><span class="detail-label">Alasan Penolakan</span>${data.alasan_tolak || '-'}</div>`;
-                html += `<div class="detail-row"><span class="detail-label">Tanggal Penolakan</span>${data.tanggal_tolak || '-'}</div>`;
+                html += `
+                    <div class="detail-item full-width">
+                        <p class="detail-label">Alasan Penolakan</p>
+                        <p class="detail-value">${data.alasan_tolak || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Tanggal Penolakan</p>
+                        <p class="detail-value">${data.tanggal_tolak || '-'}</p>
+                    </div>
+                `;
             } else if (data.status === 'Dikirim') {
-                html += `<div class="detail-row"><span class="detail-label">Kurir</span>${data.kurir || '-'}</div>`;
-                html += `<div class="detail-row"><span class="detail-label">Tanggal Kirim</span>${data.tanggal_kirim || '-'}</div>`;
+                html += `
+                    <div class="detail-item">
+                        <p class="detail-label">Kurir</p>
+                        <p class="detail-value">${data.kurir || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Tanggal Kirim</p>
+                        <p class="detail-value">${data.tanggal_kirim || '-'}</p>
+                    </div>
+                `;
             }
+            html += `</div>`;
             
             document.getElementById('detailBodyRS').innerHTML = html;
             document.getElementById('detailPermintaanModal').classList.add('active');

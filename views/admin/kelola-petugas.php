@@ -4,12 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kelola Petugas - SIDORA Admin</title>
+    <title>Kelola User - SIDORA Admin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/global.css">
-    <link rel="stylesheet" href="assets/css/pages/dashboard.css">
+    <link rel="stylesheet" href="assets/css/global.css?v=1780743553">
+    <link rel="stylesheet" href="assets/css/pages/dashboard.css?v=1780742032">
     <style>
         .filter-section {
             background: white;
@@ -36,72 +36,16 @@
             width: 100%;
         }
 
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
 
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: var(--border-radius);
-            max-width: 500px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            padding: var(--spacing-lg);
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-header h2 {
-            margin: 0;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--gray);
-        }
-
-        .modal-body {
-            padding: var(--spacing-lg);
-        }
-
-        .modal-footer {
-            padding: var(--spacing-lg);
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: flex-end;
-            gap: var(--spacing-md);
-        }
 
     </style>
     </head>
 <body>
     <div class="dashboard-layout">
-        <nav class="navbar">
+        <nav class="navbar dashboard-header">
             <div class="navbar-left">
                 <button class="navbar-toggle" id="sidebarToggle"></button>
-                <span class="navbar-brand">SIDORA Admin</span>
+                <a href="index.php" class="navbar-logo"><img src="assets/img/logo-sidora.png" alt="SIDORA" class="navbar-logo-img"></a>
             </div>
 
             <div class="navbar-right">
@@ -125,7 +69,7 @@
                 
                 <li class="sidebar-menu-item">
                     <a href="index.php?page=admin-kelola-petugas" class="sidebar-menu-link active">
-                        <i data-lucide="users"></i> <span>Kelola Petugas</span>
+                        <i data-lucide="users"></i> <span>Kelola User</span>
                     </a>
                 </li>
 
@@ -170,42 +114,151 @@
                 <div class="breadcrumb">
                     <a href="index.php?page=admin-dashboard">Dashboard</a>
                     <span>/</span>
-                    <span>Kelola Petugas</span>
+                    <span>Kelola User</span>
                 </div>
 
                 <div class="page-title">
-                    <h1>Kelola Petugas</h1>
-                    <button class="btn btn-primary-sidora" id="tambahPetugasBtn">
-                        <i data-lucide="plus"></i> Tambah Petugas
-                    </button>
+                    <h1>Kelola User</h1>
+                    <a href="index.php?page=admin-form-petugas" class="btn btn-primary-sidora" style="text-decoration:none;">
+                        <i data-lucide="plus"></i> <span>Tambah Petugas</span>
+                    </a>
                 </div>
             </div>
 
-            <?php if (!empty($_SESSION['success'])): ?><div class="alert alert-success" style="background:#d1fae5;color:#065f46;padding:0.8rem 1rem;border-radius:8px;margin-bottom:1rem;"><?= htmlspecialchars($_SESSION['success']) ?></div><?php unset($_SESSION['success']); endif; ?>
-            <?php if (!empty($_SESSION['error'])): ?><div class="alert alert-error" style="background:#fee2e2;color:#991b1b;padding:0.8rem 1rem;border-radius:8px;margin-bottom:1rem;"><?= htmlspecialchars($_SESSION['error']) ?></div><?php unset($_SESSION['error']); endif; ?>
-            <form id="filterFormPetugas" class="filter-section">
+            <?php render_alerts(); ?>
+
+            <form id="filterFormUser" class="filter-section">
+                <div class="filter-group">
+                    <label for="filterTarget">Filter Data</label>
+                    <select id="filterTarget">
+                        <option value="rumahsakit">Rumah Sakit</option>
+                        <option value="petugas">Petugas</option>
+                    </select>
+                </div>
+
                 <div class="filter-group" style="flex: 2; min-width: 200px;">
-                    <label for="searchPetugas">Cari Petugas</label>
-                    <input type="text" id="searchPetugas" placeholder="Nama atau email...">
+                    <label for="searchUser">Cari Rumah Sakit</label>
+                    <input type="text" id="searchUser" placeholder="Nama, email, kontak, atau alamat...">
                 </div>
 
                 <div class="filter-group">
                     <label for="filterStatus">Status</label>
                     <select id="filterStatus">
                         <option value="">Semua Status</option>
-                        <option value="aktif">Aktif</option>
-                        <option value="nonaktif">Non-aktif</option>
+                        <option value="terverifikasi">Terverifikasi</option>
+                        <option value="menunggu verifikasi">Menunggu Verifikasi</option>
                     </select>
                 </div>
 
-                <button type="button" class="btn btn-outline-gray" onclick="resetFilter('filterFormPetugas','tabelPetugas')"><i data-lucide="rotate-ccw"></i> <span>Reset</span></button>
+                <button type="button" class="btn btn-outline-gray" id="resetUserFilter"><i data-lucide="rotate-ccw"></i> <span>Reset</span></button>
             </form>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <h3>Verifikasi Rumah Sakit</h3>
+                    <div class="table-actions">
+                        <button type="button" class="btn btn-outline btn-small" onclick="exportTableToCSV('tabelRumahSakit','Rumah_Sakit_SIDORA.csv')"><i data-lucide="file-output"></i> <span>Export CSV</span></button>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table id="tabelRumahSakit">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Rumah Sakit</th>
+                                <th>Email</th>
+                                <th>Tipe Rumah Sakit</th>
+                                <th>No. Izin Operasional</th>
+                                <th>Kontak</th>
+                                <th>Alamat</th>
+                                <th>Status</th>
+                                <th>Tanggal Daftar</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (!empty($rumahSakitList)): $noRs = 1; foreach ($rumahSakitList as $rs): ?>
+                                <?php
+                                    $rsStatus = strtolower($rs['status'] ?? 'pending');
+                                    $rsBadgeClass = 'badge-warning';
+                                    $rsLabel = 'Menunggu Verifikasi';
+                                    if ($rsStatus === 'aktif') {
+                                        $rsBadgeClass = 'badge-success';
+                                        $rsLabel = 'Terverifikasi';
+                                    } elseif ($rsStatus === 'ditolak') {
+                                        $rsBadgeClass = 'badge-danger';
+                                        $rsLabel = 'Ditolak';
+                                    } elseif ($rsStatus === 'nonaktif') {
+                                        $rsBadgeClass = 'badge-danger';
+                                        $rsLabel = 'Non-aktif';
+                                    }
+                                    $alamatParts = array_filter([
+                                        $rs['alamat'] ?? '',
+                                        $rs['desa'] ?? '',
+                                        $rs['kecamatan'] ?? '',
+                                        $rs['provinsi'] ?? '',
+                                        $rs['kode_pos'] ?? '',
+                                    ]);
+                                    $alamatLengkap = $alamatParts ? implode(', ', $alamatParts) : '-';
+                                ?>
+                                <tr>
+                                    <td><?= $noRs++ ?></td>
+                                    <td>
+                                        <strong><?= htmlspecialchars($rs['name'] ?? '-') ?></strong><br>
+                                        <span class="text-muted"><?= htmlspecialchars($rs['username'] ?? '-') ?></span>
+                                    </td>
+                                    <td><?= htmlspecialchars($rs['email'] ?? '-') ?></td>
+                                    <td><?= htmlspecialchars($rs['tipe_rs'] ?? '-') ?></td>
+                                    <td><?= htmlspecialchars($rs['no_izin'] ?? '-') ?></td>
+                                    <td>
+                                        <?= htmlspecialchars($rs['telepon'] ?? '-') ?><br>
+                                        <span class="text-muted"><?= htmlspecialchars($rs['kontak'] ?? '-') ?></span>
+                                    </td>
+                                    <td style="max-width: 340px; white-space: normal;"><?= htmlspecialchars($alamatLengkap) ?></td>
+                                    <td><span class="badge <?= $rsBadgeClass ?>"><?= htmlspecialchars($rsLabel) ?></span></td>
+                                    <td><?= htmlspecialchars($rs['created_at'] ?? '-') ?></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <?php if ($rsStatus === 'aktif'): ?>
+                                                <form method="POST" action="index.php?page=admin-hapus-rs" style="display:inline;">
+                                                    <input type="hidden" name="id" value="<?= (int)$rs['id'] ?>">
+                                                    <button type="submit" class="btn btn-danger btn-small" onclick="return confirm('Hapus akun rumah sakit ini?');">
+                                                        <i data-lucide="trash-2"></i> <span>Hapus</span>
+                                                    </button>
+                                                </form>
+                                            <?php else: ?>
+                                                <form method="POST" action="index.php?page=admin-approve-rs" style="display:inline;">
+                                                    <input type="hidden" name="id" value="<?= (int)$rs['id'] ?>">
+                                                    <input type="hidden" name="status" value="aktif">
+                                                    <button type="submit" class="btn btn-success btn-small" onclick="return confirm('Verifikasi dan aktifkan rumah sakit ini?');">
+                                                        <i data-lucide="check"></i> <span>Verifikasi</span>
+                                                    </button>
+                                                </form>
+                                                <form method="POST" action="index.php?page=admin-approve-rs" style="display:inline;">
+                                                    <input type="hidden" name="id" value="<?= (int)$rs['id'] ?>">
+                                                    <input type="hidden" name="status" value="ditolak">
+                                                    <button type="submit" class="btn btn-danger btn-small" onclick="return confirm('Tolak verifikasi rumah sakit ini?');">
+                                                        <i data-lucide="x"></i> <span>Tolak</span>
+                                                    </button>
+                                                </form>
+                                            <?php endif; ?>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; else: ?>
+                                <tr><td colspan="10" style="text-align: center;">Belum ada rumah sakit yang mendaftar.</td></tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
             <div class="table-container">
                 <div class="table-header">
                     <h3>Daftar Petugas</h3>
                     <div class="table-actions">
-                        <button type="button" class="btn btn-outline btn-small" onclick="exportTableToCSV('tabelPetugas','Petugas_SIDORA.csv')"><i data-lucide="file-output"></i> Export CSV</button>
+                        <button type="button" class="btn btn-outline btn-small" onclick="exportTableToCSV('tabelPetugas','Petugas_SIDORA.csv')"><i data-lucide="file-output"></i> <span>Export CSV</span></button>
                     </div>
                 </div>
 
@@ -223,7 +276,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if (!empty($users)): $no = 1; foreach ($users as $user): ?>
+                            <?php if (!empty($petugasList)): $no = 1; foreach ($petugasList as $user): ?>
                                 <tr>
                                     <td><?= $no++ ?></td>
                                     <td><?= htmlspecialchars($user['name']) ?></td>
@@ -234,10 +287,10 @@
                                     <td>
                                         <div class="action-buttons">
                                             <button type="button" class="btn btn-outline-sidora btn-small" onclick='openEditPetugasModal(<?= htmlspecialchars(json_encode($user), ENT_QUOTES, "UTF-8") ?>)'>
-                                                <i data-lucide="pen"></i> Edit
+                                                <i data-lucide="pencil"></i> <span>Edit</span>
                                             </button>
                                             <button type="button" class="btn btn-danger btn-small" onclick="openHapusModal('hapusPetugasModal', <?= $user['id'] ?>)">
-                                                <i data-lucide="trash-2"></i> Hapus
+                                                <i data-lucide="trash-2"></i> <span>Hapus</span>
                                             </button>
                                         </div>
                                     </td>
@@ -252,65 +305,11 @@
         </main>
     </div>
 
-    <div class="modal" id="petugasModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle">Tambah Petugas</h2>
-                <button class="modal-close" id="closeModal"></button>
-            </div>
 
-            
-            <form id="petugasForm" action="index.php?page=admin-tambah-petugas" method="POST">
-                <div class="modal-body">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="namaPetugas" class="required">Nama Lengkap</label>
-                            <input type="text" id="namaPetugas" name="nama" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="emailPetugas" class="required">Email</label>
-                            <input type="email" id="emailPetugas" name="email" required>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="nomorPetugas" class="required">No. Telepon</label>
-                            <input type="tel" id="nomorPetugas" name="telepon" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="statusPetugas" class="required">Status</label>
-                            <select id="statusPetugas" name="status" required>
-                                <option value="aktif">Aktif</option>
-                                <option value="nonaktif">Non-aktif</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="usernamePetugas" class="required">Username</label>
-                        <input type="text" id="usernamePetugas" name="username" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="passwordPetugas" class="required">Password</label>
-                        <input type="password" id="passwordPetugas" name="password" required>
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-gray" id="cancelBtn"><i data-lucide="x"></i> <span>Batal</span></button>
-                    <button type="submit" class="btn btn-primary-sidora"><i data-lucide="save"></i> <span>Simpan</span></button>
-                </div>
-            </form>
-        </div>
-    </div>
 
     
     <div class="modal" id="editPetugasModal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 850px;">
             <div class="modal-header">
                 <h2>Edit Petugas</h2>
                 <button type="button" class="modal-close" onclick="closeModal('editPetugasModal')">&times;</button>
@@ -356,7 +355,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-gray" onclick="closeModal('editPetugasModal')"><i data-lucide="x"></i> <span>Batal</span></button>
-                    <button type="submit" class="btn btn-primary-sidora">Simpan Perubahan</button>
+                    <button type="submit" class="btn btn-primary-sidora"><i data-lucide="save"></i> <span>Simpan Perubahan</span></button>
                 </div>
             </form>
         </div>
@@ -376,7 +375,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-gray" onclick="closeModal('hapusPetugasModal')"><i data-lucide="x"></i> <span>Batal</span></button>
-                    <button type="submit" class="btn btn-danger">Ya, Hapus</button>
+                    <button type="submit" class="btn btn-danger"><i data-lucide="trash-2"></i> <span>Ya, Hapus</span></button>
                 </div>
             </form>
         </div>
@@ -384,14 +383,10 @@
 
     <script src="assets/js/sidebar.js"></script>
     <script src="assets/js/modals.js"></script>
-    <script src="assets/js/table-actions.js"></script>
+    <script src="assets/js/table-actions.js?v=1780743555"></script>
     <script>
-        
-        document.getElementById('tambahPetugasBtn').onclick = () => openModal('petugasModal');
-        document.getElementById('closeModal').onclick = () => closeModal('petugasModal');
-        document.getElementById('cancelBtn').onclick = () => closeModal('petugasModal');
 
-        
+        // Override openEditPetugasModal untuk isi field yang benar
         function openEditPetugasModal(data) {
             document.getElementById('editId').value    = data.id || '';
             document.getElementById('editNama').value  = data.name || '';
@@ -403,19 +398,87 @@
             openModal('editPetugasModal');
         }
 
-        
+        // Hapus modal — set ID
         function openHapusModal(modalId, id) {
             document.getElementById('hapusPetugasId').value = id;
             openModal('hapusPetugasModal');
         }
 
-        
-        document.getElementById('searchPetugas').addEventListener('input', function() {
-            const val = this.value.toLowerCase();
-            document.querySelectorAll('#tabelPetugas tbody tr').forEach(row => {
-                row.style.display = row.textContent.toLowerCase().includes(val) ? '' : 'none';
+        const statusOptions = {
+            rumahsakit: [
+                { value: '', label: 'Semua Status' },
+                { value: 'terverifikasi', label: 'Terverifikasi' },
+                { value: 'menunggu verifikasi', label: 'Menunggu Verifikasi' },
+            ],
+            petugas: [
+                { value: '', label: 'Semua Status' },
+                { value: 'aktif', label: 'Aktif' },
+                { value: 'non-aktif', label: 'Non-aktif' },
+            ],
+        };
+
+        function normalizeStatus(text) {
+            return text.toLowerCase().replace(/\s+/g, ' ').trim();
+        }
+
+        function updateUserFilterLabels() {
+            const target = document.getElementById('filterTarget').value;
+            const searchLabel = document.querySelector('label[for="searchUser"]');
+            const searchInput = document.getElementById('searchUser');
+            const statusSelect = document.getElementById('filterStatus');
+
+            searchLabel.textContent = target === 'rumahsakit' ? 'Cari Rumah Sakit' : 'Cari Petugas';
+            searchInput.placeholder = target === 'rumahsakit'
+                ? 'Nama, email, kontak, atau alamat...'
+                : 'Nama, email, atau telepon...';
+
+            statusSelect.innerHTML = statusOptions[target]
+                .map(option => `<option value="${option.value}">${option.label}</option>`)
+                .join('');
+        }
+
+        function resetTableRows(tableId) {
+            document.querySelectorAll(`#${tableId} tbody tr`).forEach(row => {
+                row.style.display = '';
             });
+        }
+
+        function filterUserTable() {
+            const target = document.getElementById('filterTarget').value;
+            const tableId = target === 'rumahsakit' ? 'tabelRumahSakit' : 'tabelPetugas';
+            const otherTableId = target === 'rumahsakit' ? 'tabelPetugas' : 'tabelRumahSakit';
+            const searchVal = document.getElementById('searchUser').value.toLowerCase().trim();
+            const statusVal = document.getElementById('filterStatus').value;
+
+            resetTableRows(otherTableId);
+
+            document.querySelectorAll(`#${tableId} tbody tr`).forEach(row => {
+                if (row.cells.length <= 1) return;
+
+                const text = row.textContent.toLowerCase();
+                const statusBadge = row.querySelector('.badge');
+                const statusText = statusBadge ? normalizeStatus(statusBadge.textContent) : '';
+                const matchSearch = searchVal === '' || text.includes(searchVal);
+                const matchStatus = statusVal === '' || statusText === statusVal;
+
+                row.style.display = (matchSearch && matchStatus) ? '' : 'none';
+            });
+        }
+
+        document.getElementById('filterTarget').addEventListener('change', function() {
+            document.getElementById('searchUser').value = '';
+            updateUserFilterLabels();
+            filterUserTable();
         });
+        document.getElementById('searchUser').addEventListener('input', filterUserTable);
+        document.getElementById('filterStatus').addEventListener('change', filterUserTable);
+        document.getElementById('resetUserFilter').addEventListener('click', function() {
+            document.getElementById('searchUser').value = '';
+            document.getElementById('filterStatus').value = '';
+            filterUserTable();
+        });
+
+        updateUserFilterLabels();
     </script>
 
     <script src="assets/vendor/lucide/lucide.min.js"></script>

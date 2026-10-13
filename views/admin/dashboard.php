@@ -8,15 +8,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/global.css">
-    <link rel="stylesheet" href="assets/css/pages/dashboard.css">
+    <link rel="stylesheet" href="assets/css/global.css?v=1780743553">
+    <link rel="stylesheet" href="assets/css/pages/dashboard.css?v=1780742032">
 </head>
 <body>
     <div class="dashboard-layout">
-        <nav class="navbar">
+        <nav class="navbar dashboard-header">
             <div class="navbar-left">
                 <button class="navbar-toggle" id="sidebarToggle"></button>
-                <span class="navbar-brand">SIDORA Admin</span>
+                <a href="index.php" class="navbar-logo"><img src="assets/img/logo-sidora.png" alt="SIDORA" class="navbar-logo-img"></a>
             </div>
 
             <div class="navbar-right">
@@ -40,7 +40,7 @@
                 
                 <li class="sidebar-menu-item">
                     <a href="index.php?page=admin-kelola-petugas" class="sidebar-menu-link">
-                        <i data-lucide="users"></i> <span>Kelola Petugas</span>
+                        <i data-lucide="users"></i> <span>Kelola User</span>
                     </a>
                 </li>
 
@@ -91,12 +91,12 @@
                 <div class="page-title">
                     <h1>Selamat Datang, Admin! </h1>
                     <a href="index.php?page=admin-export-semua" class="btn btn-primary-sidora">
-Buat Laporan
+<i data-lucide="file-output"></i> <span>Buat Laporan</span>
                     </a>
                 </div>
             </div>
 
-            <div class="dashboard-grid">
+            <div class="dashboard-grid grid-3-cols">
                 <div class="stat-card">
                     <div class="stat-content">
                         <h3>Total Pendonor</h3>
@@ -164,11 +164,43 @@ Aktif Bertransaksi
                 </div>
             </div>
 
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-lg); margin-bottom: var(--spacing-2xl);">
+                <div class="card" style="text-align: center; cursor: pointer; transition: var(--transition);" onmouseover="this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.boxShadow='var(--shadow)'" onclick="window.location.href='index.php?page=admin-kelola-petugas'">
+                    <div style="font-size: 2.5rem; margin-bottom: var(--spacing-md);"><i data-lucide="user-cog" style="width: 36px; height: 36px; display:inline-block; vertical-align:middle; flex-shrink:0; color:var(--primary-color);"></i></div>
+                    <h3 style="margin: 0; font-size: 1.1rem;">Kelola User</h3>
+                    <p style="color: var(--text-muted); margin: var(--spacing-sm) 0 0 0;">Atur akun petugas</p>
+                </div>
+
+                <div class="card" style="text-align: center; cursor: pointer; transition: var(--transition);" onmouseover="this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.boxShadow='var(--shadow)'" onclick="window.location.href='index.php?page=admin-jadwal-donor'">
+                    <div style="font-size: 2.5rem; margin-bottom: var(--spacing-md);"><i data-lucide="calendar" style="width: 36px; height: 36px; display:inline-block; vertical-align:middle; flex-shrink:0; color:#d97706;"></i></div>
+                    <h3 style="margin: 0; font-size: 1.1rem;">Jadwal Donor</h3>
+                    <p style="color: var(--text-muted); margin: var(--spacing-sm) 0 0 0;">Atur jadwal kegiatan</p>
+                </div>
+
+                <div class="card" style="text-align: center; cursor: pointer; transition: var(--transition);" onmouseover="this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.boxShadow='var(--shadow)'" onclick="window.location.href='index.php?page=admin-stok-darah'">
+                    <div style="font-size: 2.5rem; margin-bottom: var(--spacing-md);"><i data-lucide="droplet" style="width: 36px; height: 36px; display:inline-block; vertical-align:middle; flex-shrink:0; color:#dc2626;"></i></div>
+                    <h3 style="margin: 0; font-size: 1.1rem;">Stok Darah</h3>
+                    <p style="color: var(--text-muted); margin: var(--spacing-sm) 0 0 0;">Pantau ketersediaan</p>
+                </div>
+
+                <div class="card" style="text-align: center; cursor: pointer; transition: var(--transition);" onmouseover="this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.boxShadow='var(--shadow)'" onclick="window.location.href='index.php?page=admin-permintaan-darah'">
+                    <div style="font-size: 2.5rem; margin-bottom: var(--spacing-md);"><i data-lucide="file-text" style="width: 36px; height: 36px; display:inline-block; vertical-align:middle; flex-shrink:0; color:#16a34a;"></i></div>
+                    <h3 style="margin: 0; font-size: 1.1rem;">Permintaan Darah</h3>
+                    <p style="color: var(--text-muted); margin: var(--spacing-sm) 0 0 0;">Proses permintaan RS</p>
+                </div>
+
+                <div class="card" style="text-align: center; cursor: pointer; transition: var(--transition);" onmouseover="this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.boxShadow='var(--shadow)'" onclick="window.location.href='index.php?page=admin-daftar-pendonor'">
+                    <div style="font-size: 2.5rem; margin-bottom: var(--spacing-md);"><i data-lucide="users" style="width: 36px; height: 36px; display:inline-block; vertical-align:middle; flex-shrink:0; color:#8b5cf6;"></i></div>
+                    <h3 style="margin: 0; font-size: 1.1rem;">Daftar Pendonor</h3>
+                    <p style="color: var(--text-muted); margin: var(--spacing-sm) 0 0 0;">Lihat basis data pendonor</p>
+                </div>
+            </div>
+
             <div class="table-container">
                 <div class="table-header">
                     <h3>Permintaan Darah Terbaru</h3>
                     <div class="table-actions">
-                        <a href="index.php?page=admin-export-permintaan" class="btn btn-outline btn-small">Export</a>
+                        <a href="index.php?page=admin-permintaan-darah" class="btn btn-outline btn-small"><span>Lihat Semua</span> <i data-lucide="arrow-right"></i></a>
                     </div>
                 </div>
 
@@ -182,12 +214,11 @@ Aktif Bertransaksi
                                 <th>Jumlah</th>
                                 <th>Tanggal Permintaan</th>
                                 <th>Status</th>
-                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (!empty($permintaan) && is_array($permintaan)): ?>
-                                <?php $i=1; foreach ($permintaan as $p): ?>
+                                <?php $i=1; foreach (array_slice($permintaan, 0, 5) as $p): ?>
                                     <tr>
                                         <td><?= $i++ ?></td>
                                         <td><?= htmlspecialchars($p['rumah_sakit'] ?? $p['name'] ?? '-') ?></td>
@@ -214,45 +245,24 @@ Aktif Bertransaksi
                                             }
                                         ?>
                                         <td>
-                                            <span class="badge <?= $badgeClass ?>"><?= htmlspecialchars($labelStatus) ?></span>
-                                        </td>
-                                        <td>
-                                            <div class="action-buttons" style="display:flex;gap:5px;flex-wrap:wrap;">
-                                                <?php if ($labelStatus === 'Ditinjau'): ?>
-                                                    <a href="index.php?page=admin-terima-permintaan&id=<?= $p['id'] ?>" class="btn btn-success" onclick="return confirm('Terima permintaan ini?');">
-                                                        <i data-lucide="check"></i>
-                                                        <span>Terima</span>
-                                                    </a>
-                                                    <button type="button" class="btn btn-danger" onclick="openTolakModal(<?= $p['id'] ?>)">
-                                                        <i data-lucide="x"></i>
-                                                        <span>Tolak</span>
-                                                    </button>
-                                                    <button type="button" class="btn btn-outline-sidora" onclick='openDetailModal(<?= htmlspecialchars(json_encode($p), ENT_QUOTES, "UTF-8") ?>)'>
-                                                        <i data-lucide="eye"></i>
-                                                        <span>Detail</span>
-                                                    </button>
-                                                <?php elseif ($labelStatus === 'Disetujui'): ?>
-                                                    <button type="button" class="btn btn-primary-sidora" onclick="openKirimModal(<?= $p['id'] ?>)">
-                                                        <i data-lucide="truck"></i>
-                                                        <span>Kirim</span>
-                                                    </button>
-                                                    <button type="button" class="btn btn-outline-sidora" onclick='openDetailModal(<?= htmlspecialchars(json_encode($p), ENT_QUOTES, "UTF-8") ?>)'>
-                                                        <i data-lucide="eye"></i>
-                                                        <span>Detail</span>
-                                                    </button>
-                                                <?php elseif ($labelStatus === 'Ditolak' || $labelStatus === 'Dikirim'): ?>
-                                                    <button type="button" class="btn btn-outline-sidora" onclick='openDetailModal(<?= htmlspecialchars(json_encode($p), ENT_QUOTES, "UTF-8") ?>)'>
-                                                        <i data-lucide="eye"></i>
-                                                        <span>Detail</span>
-                                                    </button>
+                                            <span class="badge <?= $badgeClass ?>">
+                                                <?php if ($labelStatus === 'Disetujui'): ?>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
+                                                <?php elseif ($labelStatus === 'Ditolak'): ?>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                                <?php elseif ($labelStatus === 'Dikirim'): ?>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                                                <?php else: ?>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                                                 <?php endif; ?>
-                                            </div>
+                                                <?= htmlspecialchars($labelStatus) ?>
+                                            </span>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="7" style="text-align: center;">Belum ada permintaan darah terbaru.</td>
+                                    <td colspan="6" style="text-align: center;">Belum ada permintaan darah terbaru.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -263,6 +273,7 @@ Aktif Bertransaksi
             <div class="table-container">
                 <div class="table-header">
                     <h3>Status Stok Darah</h3>
+                    <a href="index.php?page=admin-stok-darah" class="btn btn-outline btn-small"><span>Lihat Semua</span> <i data-lucide="arrow-right"></i></a>
                 </div>
 
                 <div class="table-wrapper">
@@ -276,7 +287,7 @@ Aktif Bertransaksi
                         </thead>
                         <tbody>
                             <?php if (!empty($stokDarah)): ?>
-                                <?php foreach ($stokDarah as $row): ?>
+                                <?php foreach (array_slice($stokDarah, 0, 5) as $row): ?>
                                     <?php 
                                         $jml = intval($row['jumlah'] ?? 0);
                                         $minStock = 50;
@@ -294,7 +305,7 @@ Aktif Bertransaksi
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="5" style="text-align: center;">Belum ada data stok darah.</td>
+                                    <td colspan="3" style="text-align: center;">Belum ada data stok darah.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -320,7 +331,7 @@ Aktif Bertransaksi
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-gray" onclick="closeModals()"><i data-lucide="x"></i> <span>Batal</span></button>
-                    <button type="submit" class="btn btn-danger">Tolak Permintaan</button>
+                    <button type="submit" class="btn btn-danger"><i data-lucide="x-circle"></i> <span>Tolak Permintaan</span></button>
                 </div>
             </form>
         </div>
@@ -342,7 +353,7 @@ Aktif Bertransaksi
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-gray" onclick="closeModals()"><i data-lucide="x"></i> <span>Batal</span></button>
-                    <button type="submit" class="btn btn-primary-sidora">Konfirmasi Pengiriman</button>
+                    <button type="submit" class="btn btn-primary-sidora"><i data-lucide="check"></i> <span>Konfirmasi Pengiriman</span></button>
                 </div>
             </form>
         </div>
@@ -357,66 +368,8 @@ Aktif Bertransaksi
             <div class="modal-body" id="detailBody">
                 
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-gray" onclick="closeModals()"><i data-lucide="x"></i> <span>Tutup</span></button>
-            </div>
         </div>
     </div>
-
-    <style>
-        .stat-icon.info {
-            background-color: rgba(2, 132, 199, 0.1);
-            color: var(--info-color);
-        }
-
-        
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal.active {
-            display: flex;
-        }
-        .modal-content {
-            background: 
-            padding: 20px;
-            border-radius: 8px;
-            width: 100%;
-            max-width: 500px;
-            position: relative;
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .modal-close {
-            background: none; border: none; font-size: 20px; cursor: pointer;
-        }
-        .modal-footer {
-            margin-top: 20px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-        .detail-row {
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid 
-        }
-        .detail-label {
-            font-weight: 600;
-            color: 
-            display: block;
-            margin-bottom: 3px;
-        }
-    </style>
     <script src="assets/js/sidebar.js"></script>
     <script>
         function closeModals() {
@@ -450,23 +403,67 @@ Aktif Bertransaksi
                 badgeClass = 'badge-dikirim';
             }
 
+            const rawPrio = (data.prioritas || 'biasa').toLowerCase().trim();
+            let displayPrio = 'Biasa';
+            if(rawPrio === 'darurat' || rawPrio === 'tinggi') displayPrio = 'Darurat';
+            else if(rawPrio === 'segera' || rawPrio === 'sedang') displayPrio = 'Segera';
+
             let html = `
-                <div class="detail-row"><span class="detail-label">ID Permintaan</span>#REQ-${data.id || '-'}</div>
-                <div class="detail-row"><span class="detail-label">Tanggal Dibuat</span>${data.created_at || '-'}</div>
-                <div class="detail-row"><span class="detail-label">Rumah Sakit</span>${data.rumah_sakit || '-'}</div>
-                <div class="detail-row"><span class="detail-label">Golongan Darah</span>${data.golongan || '-'}${data.rhesus || ''}</div>
-                <div class="detail-row"><span class="detail-label">Jumlah Kantong</span>${data.jumlah || 0}</div>
-                <div class="detail-row"><span class="detail-label">Keterangan / Prioritas RS</span>${data.keterangan || '-' } (Prioritas: ${data.prioritas || '-'})</div>
-                <div class="detail-row"><span class="detail-label">Status</span><span class="badge ${badgeClass}">${labelStatus}</span></div>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <p class="detail-label">ID Permintaan</p>
+                        <p class="detail-value">#REQ-${data.id || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Tanggal Dibuat</p>
+                        <p class="detail-value">${data.created_at || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Rumah Sakit</p>
+                        <p class="detail-value">${data.rumah_sakit || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Golongan Darah</p>
+                        <p class="detail-value">${data.golongan || '-'}${data.rhesus || ''}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Jumlah Kantong</p>
+                        <p class="detail-value">${data.jumlah || 0}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Status</p>
+                        <p class="detail-value"><span class="badge ${badgeClass}">${labelStatus}</span></p>
+                    </div>
+                    <div class="detail-item full-width">
+                        <p class="detail-label">Keterangan / Prioritas RS</p>
+                        <p class="detail-value">${data.keterangan || '-' } (Prioritas: ${displayPrio})</p>
+                    </div>
             `;
             
             if (data.status === 'Ditolak') {
-                html += `<div class="detail-row"><span class="detail-label">Alasan Penolakan</span>${data.alasan_tolak || '-'}</div>`;
-                html += `<div class="detail-row"><span class="detail-label">Tanggal Penolakan</span>${data.tanggal_tolak || '-'}</div>`;
+                html += `
+                    <div class="detail-item full-width">
+                        <p class="detail-label">Alasan Penolakan</p>
+                        <p class="detail-value">${data.alasan_tolak || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Tanggal Penolakan</p>
+                        <p class="detail-value">${data.tanggal_tolak || '-'}</p>
+                    </div>
+                `;
             } else if (data.status === 'Dikirim') {
-                html += `<div class="detail-row"><span class="detail-label">Kurir</span>${data.kurir || '-'}</div>`;
-                html += `<div class="detail-row"><span class="detail-label">Tanggal Kirim</span>${data.tanggal_kirim || '-'}</div>`;
+                html += `
+                    <div class="detail-item">
+                        <p class="detail-label">Kurir</p>
+                        <p class="detail-value">${data.kurir || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Tanggal Kirim</p>
+                        <p class="detail-value">${data.tanggal_kirim || '-'}</p>
+                    </div>
+                `;
             }
+            html += `</div>`;
             
             document.getElementById('detailBody').innerHTML = html;
             document.getElementById('detailModal').classList.add('active');

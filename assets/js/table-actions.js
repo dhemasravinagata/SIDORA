@@ -1,9 +1,6 @@
 
 
 
-
-
-
 function filterTable(tableId, filters) {
     const table = document.getElementById(tableId);
     if (!table) return;
@@ -68,6 +65,20 @@ function exportTableToCSV(tableId, filename) {
     const rows = [];
     const headers = [];
 
+    function formatCsvCell(text, headerText) {
+        const cleanText = (text || '').trim().replace(/\s+/g, ' ');
+        const normalizedHeader = (headerText || '').toLowerCase();
+        const shouldKeepAsText =
+            normalizedHeader.includes('tanggal') ||
+            normalizedHeader.includes('waktu') ||
+            normalizedHeader.includes('nik') ||
+            normalizedHeader.includes('telepon') ||
+            /^\d{4}-\d{2}-\d{2}/.test(cleanText) ||
+            /^\d{2}:\d{2}/.test(cleanText);
+        const value = shouldKeepAsText && cleanText !== '' ? '\t' + cleanText : cleanText;
+        return '"' + value.replace(/"/g, '""') + '"';
+    }
+
     
     table.querySelectorAll('thead th').forEach(th => {
         const text = th.textContent.trim();
@@ -77,7 +88,7 @@ function exportTableToCSV(tableId, filename) {
     });
     rows.push(headers.join(','));
 
-    // Data rows
+    
     table.querySelectorAll('tbody tr').forEach(tr => {
         if (tr.style.display === 'none') return;
         const cells = [];
@@ -88,7 +99,7 @@ function exportTableToCSV(tableId, filename) {
             if (headerText === 'aksi') { tdIndex++; return; }
             const td = tr.cells[tdIndex];
             if (td) {
-                cells.push('"' + td.textContent.trim().replace(/"/g, '""') + '"');
+                cells.push(formatCsvCell(td.textContent, headerText));
             }
             tdIndex++;
         });

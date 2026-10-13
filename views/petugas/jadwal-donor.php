@@ -8,16 +8,22 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/global.css">
-    <link rel="stylesheet" href="assets/css/pages/dashboard.css">
+    <link rel="stylesheet" href="assets/css/global.css?v=1780743553">
+    <link rel="stylesheet" href="assets/css/pages/dashboard.css?v=1780742032">
+    <style>
+        .schedule-status-badge svg {
+            width: 14px;
+            height: 14px;
+        }
+    </style>
 
     </head>
 <body>
     <div class="dashboard-layout">
-        <nav class="navbar">
+        <nav class="navbar dashboard-header">
             <div class="navbar-left">
                 <button class="navbar-toggle" id="sidebarToggle"></button>
-                <span class="navbar-brand">SIDORA Petugas</span>
+                <a href="index.php" class="navbar-logo"><img src="assets/img/logo-sidora.png" alt="SIDORA" class="navbar-logo-img"></a>
             </div>
             <div class="navbar-right">
                 <div class="navbar-user">
@@ -95,11 +101,11 @@
             <div class="table-container" style="margin-top: var(--spacing-lg);">
                 <div class="table-header">
                     <h3>Jadwal Donor Mendatang</h3>
-                    <button class="btn btn-outline-sidora btn-small"><i data-lucide="file-output"></i> <span>Unduh</span></button>
+                    <button class="btn btn-outline btn-outline-sidora" onclick="exportTableToCSV('tabelJadwal', 'Jadwal_Donor.csv')"><i data-lucide="file-output"></i> <span>Export CSV</span></button>
                 </div>
 
                 <div class="table-wrapper">
-                    <table>
+                    <table id="tabelJadwal">
                         <thead>
                             <tr>
                                 <th>No</th>
@@ -121,11 +127,13 @@
                                 <td><?= htmlspecialchars($jadwal['lokasi'] ?? '-') ?></td>
                                 <td><?= htmlspecialchars($jadwal['target'] ?? '-') ?> orang</td>
                                 <td><?= htmlspecialchars($jadwal['terdaftar'] ?? '0') ?> Peserta</td>
-                                <td><span class="badge badge-warning"><i data-lucide="calendar"></i> Terjadwal</span></td>
+                                <td><span class="badge badge-warning schedule-status-badge"><i data-lucide="calendar"></i> Terjadwal</span></td>
                                 <td>
-                                    <button class="btn btn-outline-sidora btn-small" onclick='openDetailJadwalModal(<?= htmlspecialchars(json_encode($jadwal), ENT_QUOTES, "UTF-8") ?>)'>
-                                        <i data-lucide="eye"></i> Lihat
-                                    </button>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-outline-sidora btn-small" onclick='openDetailJadwalModal(<?= htmlspecialchars(json_encode($jadwal), ENT_QUOTES, "UTF-8") ?>)'>
+                                            <i data-lucide="eye"></i> <span>Detail</span>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                             <?php endforeach; else: ?>
@@ -150,42 +158,50 @@
 
     
     <div class="modal" id="detailJadwalModal">
-        <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-content">
             <div class="modal-header">
                 <h2>Detail Jadwal Donor</h2>
-                <button class="modal-close" onclick="closeModal('detailJadwalModal')">&times;</button>
+                <button type="button" class="modal-close" onclick="closeModal('detailJadwalModal')">&times;</button>
             </div>
-            <div class="modal-body">
-                <div style="display: grid; grid-template-columns: 150px 1fr; gap: 10px; margin-bottom: 10px;">
-                    <strong>Lokasi:</strong> <span id="j-lokasi"></span>
-                    <strong>Tanggal:</strong> <span id="j-tanggal"></span>
-                    <strong>Waktu:</strong> <span id="j-waktu"></span>
-                    <strong>Target Pendaftar:</strong> <span id="j-target"></span>
-                    <strong>Terdaftar:</strong> <span id="j-terdaftar"></span>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline-gray" onclick="closeModal('detailJadwalModal')"><i data-lucide="x"></i> <span>Tutup</span></button>
+            <div class="modal-body" id="detailJadwalBody">
+                
             </div>
         </div>
     </div>
 
-    <style>
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; overflow-y: auto; }
-    .modal.active { display: flex; }
-    .modal-content { background: white; border-radius: 8px; width: 90%; margin: auto; }
-    .modal-header { padding: 16px; border-bottom: 1px solid 
-    .modal-body { padding: 16px; max-height: 70vh; overflow-y: auto; }
-    .modal-footer { padding: 16px; border-top: 1px solid 
-    </style>
+
 
     <script>
         function openDetailJadwalModal(data) {
-            document.getElementById('j-lokasi').textContent = data.lokasi || '-';
-            document.getElementById('j-tanggal').textContent = data.tanggal || '-';
-            document.getElementById('j-waktu').textContent = (data.waktu_mulai || '-') + ' - ' + (data.waktu_selesai || '-');
-            document.getElementById('j-target').textContent = (data.target || 0) + ' orang';
-            document.getElementById('j-terdaftar').textContent = (data.terdaftar || 0) + ' orang';
+            const html = `
+                <div class="detail-grid">
+                    <div class="detail-item full-width">
+                        <p class="detail-label">Lokasi Penyelenggaraan / Instansi</p>
+                        <p class="detail-value">${data.lokasi || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Tanggal Pelaksanaan</p>
+                        <p class="detail-value">${data.tanggal || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Waktu</p>
+                        <p class="detail-value">${(data.waktu_mulai || '-').substring(0,5)} s.d. ${(data.waktu_selesai || '-').substring(0,5)}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Target Pendonor</p>
+                        <p class="detail-value">${data.target || 0} orang</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Pendaftar Terdaftar</p>
+                        <p class="detail-value">${data.terdaftar || 0} orang</p>
+                    </div>
+                    <div class="detail-item full-width">
+                        <p class="detail-label">Catatan Tambahan</p>
+                        <p class="detail-value">${data.catatan || 'Belum diatur'}</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('detailJadwalBody').innerHTML = html;
             document.getElementById('detailJadwalModal').classList.add('active');
         }
         function closeModal(id) {
@@ -193,6 +209,7 @@
         }
     </script>
     <script src="assets/js/sidebar.js"></script>
+    <script src="assets/js/table-actions.js?v=1780743555"></script>
 
     <script src="assets/vendor/lucide/lucide.min.js"></script>
     <script>lucide.createIcons();</script>

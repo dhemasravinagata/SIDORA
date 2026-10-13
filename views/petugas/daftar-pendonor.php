@@ -8,93 +8,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/global.css">
-    <link rel="stylesheet" href="assets/css/pages/dashboard.css">
+    <link rel="stylesheet" href="assets/css/global.css?v=1780743553">
+    <link rel="stylesheet" href="assets/css/pages/dashboard.css?v=1780742032">
     <style>
-        .filter-section {
-            background: white;
-            padding: var(--spacing-lg);
-            border-radius: var(--border-radius);
-            margin-bottom: var(--spacing-lg);
-            display: flex;
-            gap: var(--spacing-md);
-            flex-wrap: wrap;
-            align-items: flex-end;
-        }
 
-        .filter-group {
-            flex: 1;
-            min-width: 150px;
-        }
 
-        .filter-group label {
-            margin-bottom: var(--spacing-sm);
-        }
 
-        .filter-group input,
-        .filter-group select {
-            width: 100%;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            overflow-y: auto;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: var(--border-radius);
-            max-width: 600px;
-            width: 90%;
-            margin: auto;
-        }
-
-        .modal-header {
-            padding: var(--spacing-lg);
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-header h2 {
-            margin: 0;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--gray);
-        }
-
-        .modal-body {
-            padding: var(--spacing-lg);
-            max-height: 70vh;
-            overflow-y: auto;
-        }
-
-        .modal-footer {
-            padding: var(--spacing-lg);
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: flex-end;
-            gap: var(--spacing-md);
-        }
 
         .form-row {
             display: grid;
@@ -117,8 +36,8 @@
         }
 
         .badge-success {
-            background-color: 
-            color: 
+            background-color: #dcfce7;
+            color: #166534;
         }
 
         .info {
@@ -135,16 +54,16 @@
         }
 
         .btn-info:hover:not(:disabled) {
-            background-color: 
+            background-color: #0270cc;
         }
     </style>
     </head>
 <body>
     <div class="dashboard-layout">
-        <nav class="navbar">
+        <nav class="navbar dashboard-header">
             <div class="navbar-left">
                 <button class="navbar-toggle" id="sidebarToggle"></button>
-                <span class="navbar-brand">SIDORA Petugas</span>
+                <a href="index.php" class="navbar-logo"><img src="assets/img/logo-sidora.png" alt="SIDORA" class="navbar-logo-img"></a>
             </div>
 
             <div class="navbar-right">
@@ -224,12 +143,11 @@
 
                 <div class="page-title">
                     <h1>Daftar Pendonor</h1>
-                    <button class="btn btn-primary-sidora" id="tambahPendonorBtn">Tambah Pendonor
-                    </button>
+                    <a href="index.php?page=petugas-form-pendonor" class="btn btn-primary-sidora" style="text-decoration:none;"><i data-lucide="plus"></i> <span>Tambah Pendonor</span></a>
                 </div>
             </div>
 
-            <div class="filter-section">
+            <div class="card filter-card">
                 <div class="filter-group" style="flex: 2; min-width: 200px;">
                     <label for="searchPendonor">Cari Pendonor</label>
                     <input type="text" id="searchPendonor" placeholder="Nama, No. Identitas, No. Telepon...">
@@ -272,48 +190,41 @@
                             <tr>
                                 <th>No</th>
                                 <th>Nama Lengkap</th>
-                                <th>No. Identitas</th>
-                                <th>Jenis Kelamin</th>
-                                <th>Golongan Darah</th>
-                                <th>Rhesus</th>
+                                <th>Gol. Darah</th>
                                 <th>No. Telepon</th>
                                 <th>Status</th>
-                                <th>Terakhir Donor</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (!empty($pendonorList)): $no=1; foreach ($pendonorList as $pendonor): 
-                                $gol = strtoupper($pendonor['golongan'] ?? '-');
-                                $color = 'var(--primary-color)';
-                                if($gol == 'O') $color = '#166534';
-                                elseif($gol == 'A') $color = '#991b1b';
-                                elseif($gol == 'B') $color = '#164e63';
-                                elseif($gol == 'AB') $color = '#3730a3';
-                                
-                                $bg = '#f3f4f6';
-                                if($gol == 'O') $bg = '#dcfce7';
-                                elseif($gol == 'A') $bg = '#fee2e2';
-                                elseif($gol == 'B') $bg = '#cffafe';
-                                elseif($gol == 'AB') $bg = '#e0e7ff';
+                                $gol = $pendonor['golongan'] ?? '';
                             ?>
                             <tr>
                                 <td><?= $no++ ?></td>
                                 <td><?= htmlspecialchars(!empty($pendonor['nama']) ? $pendonor['nama'] : '-') ?></td>
-                                <td><?= htmlspecialchars(!empty($pendonor['nik']) ? $pendonor['nik'] : '-') ?></td>
-                                <td><?= htmlspecialchars(!empty($pendonor['jenis_kelamin']) ? $pendonor['jenis_kelamin'] : '-') ?></td>
-                                <td><span style="background: <?= $bg ?>; padding: 4px 10px; border-radius: 4px; color: <?= $color ?>; font-weight: 600; font-size: 12px;"><?= htmlspecialchars(!empty($pendonor['golongan']) ? $pendonor['golongan'] : '-') ?></span></td>
-                                <td><?= htmlspecialchars(!empty($pendonor['rhesus']) ? $pendonor['rhesus'] : '-') ?></td>
+                                <td><?= htmlspecialchars((!empty($pendonor['golongan']) ? $pendonor['golongan'] : '-') . (!empty($pendonor['rhesus']) ? $pendonor['rhesus'] : '')) ?></td>
                                 <td><?= htmlspecialchars(!empty($pendonor['telepon']) ? $pendonor['telepon'] : '-') ?></td>
-                                <td><?php $s=$pendonor['status']??'aktif'; echo $s==='aktif' ? '<span class="badge badge-success">Aktif</span>' : '<span class="badge badge-warning">Non-aktif</span>'; ?></td>
-                                <td><?= htmlspecialchars(!empty($pendonor['terakhir_donor']) ? $pendonor['terakhir_donor'] : (!empty($pendonor['tgl_donor']) ? $pendonor['tgl_donor'] : '-')) ?></td>
+                                <td>
+                                    <?php $s=$pendonor['status']??'aktif'; ?>
+                                    <span class="badge <?= $s === 'aktif' ? 'badge-success' : 'badge-warning' ?>">
+                                        <?php if ($s === 'aktif'): ?>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg> Aktif
+                                        <?php else: ?>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Non-aktif
+                                        <?php endif; ?>
+                                    </span>
+                                </td>
                                 <td>
                                     <div class="action-buttons">
-                                        <button type="button" class="btn btn-outline btn-small" onclick='openDetailPendonorModal(<?= htmlspecialchars(json_encode($pendonor), ENT_QUOTES, "UTF-8") ?>)'>
-Detail
+                                        <button type="button" class="btn btn-outline-sidora btn-small" onclick='openEditPendonorModal(<?= htmlspecialchars(json_encode($pendonor), ENT_QUOTES, "UTF-8") ?>)'>
+                                            <i data-lucide="pencil"></i> <span>Edit</span>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-sidora btn-small" onclick='openDetailPendonorModal(<?= htmlspecialchars(json_encode($pendonor), ENT_QUOTES, "UTF-8") ?>)'>
+                                            <i data-lucide="eye"></i> <span>Detail</span>
                                         </button>
                                         <button type="button" class="btn btn-danger btn-small" onclick="hapusPendonor(<?= $pendonor['id'] ?>)">
-Hapus
+<i data-lucide="trash-2"></i> <span>Hapus</span>
                                         </button>
                                     </div>
                                 </td>
@@ -328,43 +239,43 @@ Hapus
         </main>
     </div>
 
-    <div class="modal" id="pendonorModal">
-        <div class="modal-content">
+
+
+    
+    <div class="modal" id="editPendonorModal">
+        <div class="modal-content" style="max-width: 850px;">
             <div class="modal-header">
-                <h2 id="modalTitle">Tambah Pendonor</h2>
-                <button class="modal-close" id="closeModal"></button>
+                <h2>Edit Pendonor</h2>
+                <button type="button" class="modal-close" onclick="closeModal('editPendonorModal')">&times;</button>
             </div>
 
-            <form id="pendonorForm" action="index.php?page=petugas-tambah-pendonor" method="POST">
+            <form id="editPendonorForm" action="index.php?page=petugas-edit-pendonor" method="POST">
+                <input type="hidden" id="editPendonorId" name="id">
                 <div class="modal-body">
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="namaPendonor" class="required">Nama Lengkap</label>
-                            <input type="text" id="namaPendonor" name="nama" required>
+                            <label for="editNamaPendonor" class="required">Nama Lengkap</label>
+                            <input type="text" id="editNamaPendonor" name="nama" required>
                         </div>
-
                         <div class="form-group">
-                            <label for="noIdentitas" class="required">No. Identitas (KTP/NIK)</label>
-                            <input type="text" id="noIdentitas" name="no_identitas" required>
+                            <label for="editNoIdentitas" class="required">No. Identitas (KTP/NIK)</label>
+                            <input type="text" id="editNoIdentitas" name="nik" required>
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="golDarah" class="required">Golongan Darah</label>
-                            <select id="golDarah" name="golongan_darah" required>
-                                <option value="">-- Pilih Golongan Darah --</option>
+                            <label for="editGolDarah" class="required">Golongan Darah</label>
+                            <select id="editGolDarah" name="golongan_darah" required>
                                 <option value="A">A</option>
                                 <option value="B">B</option>
                                 <option value="AB">AB</option>
                                 <option value="O">O</option>
                             </select>
                         </div>
-
                         <div class="form-group">
-                            <label for="rhesus" class="required">Rhesus</label>
-                            <select id="rhesus" name="rhesus" required>
-                                <option value="">-- Pilih Rhesus --</option>
+                            <label for="editRhesus" class="required">Rhesus</label>
+                            <select id="editRhesus" name="rhesus" required>
                                 <option value="+">Positif (+)</option>
                                 <option value="-">Negatif (-)</option>
                             </select>
@@ -373,26 +284,23 @@ Hapus
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="nomorTelepon" class="required">No. Telepon</label>
-                            <input type="tel" id="nomorTelepon" name="telepon" required>
+                            <label for="editNomorTelepon" class="required">No. Telepon</label>
+                            <input type="tel" id="editNomorTelepon" name="telepon" required>
                         </div>
-
                         <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" id="email" name="email">
+                            <label for="editEmail">Email</label>
+                            <input type="email" id="editEmail" name="email">
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="tanggalLahir" class="required">Tanggal Lahir</label>
-                            <input type="date" id="tanggalLahir" name="tanggal_lahir" required>
+                            <label for="editTanggalLahir" class="required">Tanggal Lahir</label>
+                            <input type="date" id="editTanggalLahir" name="tanggal_lahir" required>
                         </div>
-
                         <div class="form-group">
-                            <label for="jenisKelamin" class="required">Jenis Kelamin</label>
-                            <select id="jenisKelamin" name="jenis_kelamin" required>
-                                <option value="">-- Pilih --</option>
+                            <label for="editJenisKelamin" class="required">Jenis Kelamin</label>
+                            <select id="editJenisKelamin" name="jenis_kelamin" required>
                                 <option value="Laki-laki">Laki-laki</option>
                                 <option value="Perempuan">Perempuan</option>
                             </select>
@@ -400,51 +308,36 @@ Hapus
                     </div>
 
                     <div class="form-group">
-                        <label for="alamat" class="required">Alamat</label>
-                        <textarea id="alamat" name="alamat" required></textarea>
+                        <label for="editAlamat" class="required">Alamat</label>
+                        <textarea id="editAlamat" name="alamat" required></textarea>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="kota">Kota</label>
-                            <input type="text" id="kota" name="kota">
+                            <label for="editKota">Kota</label>
+                            <input type="text" id="editKota" name="kota">
                         </div>
-
                         <div class="form-group">
-                            <label for="provinsi">Provinsi</label>
-                            <input type="text" id="provinsi" name="provinsi">
+                            <label for="editProvinsi">Provinsi</label>
+                            <input type="text" id="editProvinsi" name="provinsi">
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="pekerjaan">Pekerjaan</label>
-                            <input type="text" id="pekerjaan" name="pekerjaan">
+                            <label for="editPekerjaan">Pekerjaan</label>
+                            <input type="text" id="editPekerjaan" name="pekerjaan">
                         </div>
-
-                        <div class="form-group">
-                            <label for="tekananDarah">Tekanan Darah (Misal: 120/80)</label>
-                            <input type="text" id="tekananDarah" name="tekanan_darah" value="120/80">
+                        <div class="form-group form-check" style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" id="editStatusAktif" name="status" value="aktif">
+                            <label for="editStatusAktif" style="margin:0;">Pendonor Aktif</label>
                         </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="statusDonasi">Status Donasi Awal</label>
-                        <select id="statusDonasi" name="status_donasi" required>
-                            <option value="Berhasil">Berhasil (Stok akan bertambah)</option>
-                            <option value="Ditolak">Ditolak (Stok tidak bertambah)</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group form-check">
-                        <input type="checkbox" id="statusAktif" name="status" value="aktif" checked>
-                        <label for="statusAktif">Pendonor Aktif</label>
                     </div>
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-gray" id="cancelBtn"><i data-lucide="x"></i> <span>Batal</span></button>
-                    <button type="submit" class="btn btn-primary-sidora"><i data-lucide="save"></i> <span>Simpan</span></button>
+                    <button type="button" class="btn btn-outline-gray" onclick="closeModal('editPendonorModal')"><i data-lucide="x"></i> <span>Batal</span></button>
+                    <button type="submit" class="btn btn-primary-sidora"><i data-lucide="save"></i> <span>Simpan Perubahan</span></button>
                 </div>
             </form>
         </div>
@@ -452,15 +345,12 @@ Hapus
 
     
     <div class="modal" id="detailPendonorModal">
-        <div class="modal-content" style="max-width:550px;">
+        <div class="modal-content">
             <div class="modal-header">
                 <h2>Detail Pendonor</h2>
                 <button type="button" class="modal-close" onclick="closeModal('detailPendonorModal')">&times;</button>
             </div>
             <div class="modal-body" id="detailPendonorBody"></div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-gray" onclick="closeModal('detailPendonorModal')"><i data-lucide="x"></i> <span>Tutup</span></button>
-            </div>
         </div>
     </div>
 
@@ -471,19 +361,9 @@ Hapus
 
     <script src="assets/js/sidebar.js"></script>
     <script src="assets/js/modals.js"></script>
-    <script src="assets/js/table-actions.js"></script>
+    <script src="assets/js/table-actions.js?v=1780743555"></script>
     <script>
-        
-        const modal = document.getElementById('pendonorModal');
-        const btn = document.getElementById('tambahPendonorBtn');
-        const span = document.getElementById('closeModal');
-        const cancelBtn = document.getElementById('cancelBtn');
 
-        if(btn)       btn.onclick       = () => openModal('pendonorModal');
-        if(span)      span.onclick      = () => closeModal('pendonorModal');
-        if(cancelBtn) cancelBtn.onclick = () => closeModal('pendonorModal');
-
-        
         function hapusPendonor(id) {
             if (confirm('Hapus pendonor ini? Data riwayat donasi terkait mungkin juga terpengaruh.')) {
                 document.getElementById('hapusPendonorId').value = id;
@@ -491,24 +371,122 @@ Hapus
             }
         }
 
+        function openEditPendonorModal(data) {
+            document.getElementById('editPendonorId').value = data.id || '';
+            document.getElementById('editNamaPendonor').value = data.nama || '';
+            document.getElementById('editNoIdentitas').value = data.nik || '';
+            document.getElementById('editGolDarah').value = data.golongan || 'A';
+            document.getElementById('editRhesus').value = data.rhesus || '+';
+            document.getElementById('editNomorTelepon').value = data.telepon || '';
+            document.getElementById('editEmail').value = data.email || '';
+            document.getElementById('editTanggalLahir').value = data.tanggal_lahir || data.tgl_lahir || '';
+            document.getElementById('editJenisKelamin').value = data.jenis_kelamin || 'Laki-laki';
+            document.getElementById('editAlamat').value = data.alamat || '';
+            document.getElementById('editKota').value = data.kota || '';
+            document.getElementById('editProvinsi').value = data.provinsi || '';
+            document.getElementById('editPekerjaan').value = data.pekerjaan || '';
+            document.getElementById('editStatusAktif').checked = (data.status === 'aktif' || !data.status);
+            
+            document.getElementById('editPendonorModal').classList.add('active');
+        }
+
         function openDetailPendonorModal(data) {
             const html = `
-                <div style="display: grid; grid-template-columns: 150px 1fr; gap: 10px; margin-bottom: 10px;">
-                    <strong>Nama Lengkap:</strong> <span>${data.nama || '-'}</span>
-                    <strong>No. Identitas:</strong> <span>${data.nik || '-'}</span>
-                    <strong>Jenis Kelamin:</strong> <span>${data.jenis_kelamin || '-'}</span>
-                    <strong>Tanggal Lahir:</strong> <span>${data.tanggal_lahir || data.tgl_lahir || '-'}</span>
-                    <strong>Gol. Darah:</strong> <span>${data.golongan || '-'}${data.rhesus || ''}</span>
-                    <strong>No. Telepon:</strong> <span>${data.telepon || '-'}</span>
-                    <strong>Alamat:</strong> <span>${data.alamat || '-'}</span>
-                    <strong>Status:</strong> <span>${data.status || 'Aktif'}</span>
-                    <strong>Terakhir Donor:</strong> <span>${data.terakhir_donor || data.tgl_donor || '-'}</span>
-                    <strong>Riwayat Donor:</strong> <span>${data.riwayat_donor || '-'}</span>
+                <div class="detail-grid">
+                    <div class="detail-item full-width">
+                        <p class="detail-label">Nama Lengkap</p>
+                        <p class="detail-value">${data.nama || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">No. Identitas (NIK)</p>
+                        <p class="detail-value">${data.nik || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Jenis Kelamin</p>
+                        <p class="detail-value">${data.jenis_kelamin || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Tanggal Lahir</p>
+                        <p class="detail-value">${data.tanggal_lahir || data.tgl_lahir || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Golongan Darah</p>
+                        <p class="detail-value">${data.golongan || '-'}${data.rhesus || ''}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">No. Telepon</p>
+                        <p class="detail-value">${data.telepon || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Pekerjaan</p>
+                        <p class="detail-value">${data.pekerjaan || '-'}</p>
+                    </div>
+                    <div class="detail-item full-width">
+                        <p class="detail-label">Alamat Lengkap</p>
+                        <p class="detail-value">${data.alamat || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Status</p>
+                        <p class="detail-value"><span class="badge ${(!data.status || data.status === 'aktif') ? 'badge-success' : 'badge-warning'}">${data.status || 'Aktif'}</span></p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Terakhir Donor</p>
+                        <p class="detail-value">${data.terakhir_donor || data.tgl_donor || '-'}</p>
+                    </div>
+                    <div class="detail-item full-width">
+                        <p class="detail-label">Riwayat Donor Tambahan</p>
+                        <p class="detail-value">${data.riwayat_donor || 'Belum ada catatan'}</p>
+                    </div>
                 </div>
             `;
             document.getElementById('detailPendonorBody').innerHTML = html;
             document.getElementById('detailPendonorModal').classList.add('active');
         }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchPendonor');
+            const golSelect = document.getElementById('filterGolDarah');
+            const statusSelect = document.getElementById('filterStatus');
+            const tableBody = document.querySelector('#tabelPendonor tbody');
+            const rows = tableBody.querySelectorAll('tr');
+            const resetBtn = document.querySelector('.filter-section .btn-outline-gray');
+            
+            function filterTable() {
+                const searchVal = searchInput.value.toLowerCase().trim();
+                const golVal = golSelect.value.toLowerCase();
+                const statusVal = statusSelect.value.toLowerCase();
+                
+                rows.forEach(row => {
+                    if(row.cells.length <= 1) return;
+                    
+                    const text = row.textContent.toLowerCase();
+                    const golCell = row.cells[2];
+                    const golText = golCell ? golCell.textContent.toLowerCase().trim() : '';
+                    
+                    const statusBadge = row.querySelector('.badge');
+                    const statusText = statusBadge ? statusBadge.textContent.toLowerCase().trim() : '';
+                    
+                    const matchSearch = searchVal === '' || text.includes(searchVal);
+                    const matchGol = golVal === '' || golText === golVal;
+                    const matchStatus = statusVal === '' || statusText === statusVal || (statusVal === 'nonaktif' && statusText === 'non-aktif');
+                    
+                    row.style.display = (matchSearch && matchGol && matchStatus) ? '' : 'none';
+                });
+            }
+            
+            if(searchInput) searchInput.addEventListener('input', filterTable);
+            if(golSelect) golSelect.addEventListener('change', filterTable);
+            if(statusSelect) statusSelect.addEventListener('change', filterTable);
+            
+            if(resetBtn) {
+                resetBtn.addEventListener('click', function() {
+                    searchInput.value = '';
+                    golSelect.value = '';
+                    statusSelect.value = '';
+                    filterTable();
+                });
+            }
+        });
     </script>
 
     <script src="assets/vendor/lucide/lucide.min.js"></script>

@@ -1,0 +1,362 @@
+.auth-page {
+  background: linear-gradient(135deg, #8E1616 0%, #D84040 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-base);
+}
+
+.auth-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-2xl);
+  max-width: 1200px;
+  width: 100%;
+  align-items: center;
+}
+
+.auth-box {
+  background: white;
+  border-radius: calc(var(--border-radius) * 2);
+  padding: var(--spacing-2xl);
+  box-shadow: var(--shadow-lg);
+  animation: slideInLeft 0.5s ease;
+}
+
+.auth-side {
+  color: white;
+  animation: slideInRight 0.5s ease;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: var(--spacing-2xl);
+}
+
+.logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.logo svg {
+  animation: rotateIn 0.6s ease;
+}
+
+@keyframes rotateIn {
+  from {
+    opacity: 0;
+    transform: rotate(-10deg) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0) scale(1);
+  }
+}
+
+.auth-header h1 {
+  font-size: 2rem;
+  color: var(--primary-color);
+  margin-bottom: var(--spacing-sm);
+}
+
+.auth-header .subtitle {
+  color: var(--gray);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.login-form {
+  margin-bottom: var(--spacing-lg);
+}
+
+.login-form .form-group {
+  margin-bottom: var(--spacing-lg);
+}
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  flex: 1;
+}
+
+.toggle-password {
+  position: absolute;
+  right: var(--spacing-base);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.btn-login {
+  width: 100%;
+  height: 44px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+}
+
+.btn-login i {
+  width: 15px;
+  height: 15px;
+}
+
+.btn-login:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(30, 58, 138, 0.4);
+}
+
+.auth-footer {
+  text-align: center;
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--border-color);
+}
+
+.auth-footer p {
+  margin-bottom: var(--spacing-sm);
+  font-size: 0.9rem;
+}
+
+.auth-footer a {
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.auth-footer a:hover {
+  color: var(--secondary-color);
+}
+
+.role-info {
+  background-color: var(--light-gray);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.role-info p {
+  margin-bottom: var(--spacing-sm);
+  color: var(--dark-gray);
+}
+
+.role-info ul {
+  list-style: none;
+  margin: 0;
+}
+
+.role-info li {
+  padding: var(--spacing-xs) 0;
+  color: var(--gray);
+}
+
+.side-content {
+  padding: var(--spacing-lg);
+}
+
+.side-content h2 {
+  font-size: 2.2rem;
+  color: white;
+  margin-bottom: var(--spacing-md);
+}
+
+.side-content > p {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.features {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-lg);
+}
+
+.feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  color: white;
+  font-size: 1rem;
+}
+
+.feature-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+  font-weight: bold;
+}
+
+.register-form {
+  margin-bottom: var(--spacing-lg);
+}
+
+.register-form .form-row {
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+@media (max-width: 968px) {
+  .auth-container {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-side {
+    display: none;
+  }
+
+  .auth-box {
+    padding: var(--spacing-lg);
+  }
+}
+
+@media (max-width: 768px) {
+  .auth-page {
+    padding: var(--spacing-base);
+  }
+
+  .auth-box {
+    padding: var(--spacing-lg);
+  }
+
+  .auth-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .register-form .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-box {
+    padding: var(--spacing-md);
+  }
+
+  .login-form .form-group {
+    margin-bottom: var(--spacing-md);
+  }
+}
+
+
+.auth-logo,
+.form-logo {
+display: flex;
+justify-content: center;
+align-items: center;
+margin-bottom: 20px;
+color: #1F2937;
+opacity: 1;
+position: relative;
+}
+
+.auth-logo-mask,
+.form-logo-mask {
+width: 170px;
+height: 42px;
+display: block;
+background-color: #1F2937;
+opacity: 1;
+
+-webkit-mask-image: url("../img/logo-sidora.png");
+-webkit-mask-repeat: no-repeat;
+-webkit-mask-position: center;
+-webkit-mask-size: contain;
+
+mask-image: url("../img/logo-sidora.png");
+mask-repeat: no-repeat;
+mask-position: center;
+mask-size: contain;
+}
+
+
+.auth-logo,
+.form-logo {
+display: flex;
+justify-content: center;
+align-items: center;
+margin-bottom: 20px;
+color: #1F2937;
+opacity: 1;
+position: relative;
+}
+
+.auth-logo-mask,
+.form-logo-mask {
+width: 170px;
+height: 42px;
+display: block;
+background-color: #1F2937;
+opacity: 1;
+
+-webkit-mask-image: url("../img/logo-sidora.png");
+-webkit-mask-repeat: no-repeat;
+-webkit-mask-position: center;
+-webkit-mask-size: contain;
+
+mask-image: url("../img/logo-sidora.png");
+mask-repeat: no-repeat;
+mask-position: center;
+mask-size: contain;
+}
+
+
+.auth-box input[type="text"], .auth-box input[type="email"], .auth-box input[type="password"], .auth-box textarea {
+    border: 1px solid #9CA3AF !important;
+}
+
+
+
+.auth-footer p {
+    font-size: 14px !important;
+    color: #4B5563 !important;
+    font-weight: 500 !important;
+    font-family: 'Poppins', sans-serif !important;
+    margin-bottom: 8px !important;
+}
+
+.auth-footer a {
+    color: #8E1616 !important; 
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    transition: all 0.3s ease;
+}
+
+.auth-footer a:hover {
+    color: #D84040 !important;
+    text-decoration: underline !important;
+}

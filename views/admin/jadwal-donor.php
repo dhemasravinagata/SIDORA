@@ -8,8 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/global.css">
-    <link rel="stylesheet" href="assets/css/pages/dashboard.css">
+    <link rel="stylesheet" href="assets/css/global.css?v=1780743553">
+    <link rel="stylesheet" href="assets/css/pages/dashboard.css?v=1780742032">
     <style>
         .jadwal-card {
             background: white;
@@ -51,25 +51,18 @@
             gap: var(--spacing-sm);
         }
 
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; overflow-y: auto; }
-        .modal.active { display: flex; }
-        .modal-content { background: white; border-radius: 8px; width: 90%; max-width: 500px; margin: auto; }
-        .modal-header { padding: 16px; border-bottom: 1px solid 
-        .modal-body { padding: 16px; max-height: 70vh; overflow-y: auto; }
-        .modal-footer { padding: 16px; border-top: 1px solid 
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
-        .form-group input { width: 100%; padding: 8px; border: 1px solid 
-        .detail-row { display: flex; margin-bottom: 10px; border-bottom: 1px solid 
-        .detail-label { font-weight: 600; width: 150px; flex-shrink: 0; }
+        .edit-jadwal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); }
+        @media (max-width: 768px) {
+            .edit-jadwal-grid { grid-template-columns: 1fr; }
+        }
     </style>
     </head>
 <body>
     <div class="dashboard-layout">
-        <nav class="navbar">
+        <nav class="navbar dashboard-header">
             <div class="navbar-left">
                 <button class="navbar-toggle" id="sidebarToggle"></button>
-                <span class="navbar-brand">SIDORA Admin</span>
+                <a href="index.php" class="navbar-logo"><img src="assets/img/logo-sidora.png" alt="SIDORA" class="navbar-logo-img"></a>
             </div>
             <div class="navbar-right">
                 <div class="navbar-user">
@@ -90,7 +83,7 @@
                 <li class="sidebar-title">MANAJEMEN DATA</li>
                 <li class="sidebar-menu-item">
                     <a href="index.php?page=admin-kelola-petugas" class="sidebar-menu-link">
-                        <i data-lucide="users"></i> <span>Kelola Petugas</span>
+                        <i data-lucide="users"></i> <span>Kelola User</span>
                     </a>
                 </li>
                 <li class="sidebar-menu-item">
@@ -138,7 +131,7 @@
                 </div>
             </div>
 
-            <div class="dashboard-grid">
+            <div class="dashboard-grid grid-3-cols">
                 <div class="stat-card">
                     <div class="stat-content">
                         <h3>Total Jadwal</h3>
@@ -172,7 +165,7 @@
                     <div class="jadwal-info">
                         <h4><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> <?= htmlspecialchars($jadwal['lokasi'] ?? 'Lokasi') ?></h4>
                         <p><strong><?= htmlspecialchars($jadwal['tanggal'] ?? '-') ?></strong></p>
-                        <p>Waktu Pelaksanaan: <?= htmlspecialchars($jadwal['waktu_mulai'] ?? '-') ?> - <?= htmlspecialchars($jadwal['waktu_selesai'] ?? '-') ?></p>
+                        <p>Waktu Pelaksanaan: <?= !empty($jadwal['waktu_mulai']) ? substr($jadwal['waktu_mulai'], 0, 5) : '-' ?> - <?= !empty($jadwal['waktu_selesai']) ? substr($jadwal['waktu_selesai'], 0, 5) : '-' ?></p>
                         <p>Lokasi: <?= htmlspecialchars($jadwal['lokasi_detail'] ?? $jadwal['lokasi'] ?? '-') ?></p>
                     </div>
                     <div class="jadwal-info">
@@ -214,15 +207,12 @@
                 <button type="button" class="modal-close" onclick="closeModal('detailJadwalModal')">&times;</button>
             </div>
             <div class="modal-body" id="detailJadwalBody"></div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-gray" onclick="closeModal('detailJadwalModal')"><i data-lucide="x"></i> <span>Tutup</span></button>
-            </div>
         </div>
     </div>
 
     
     <div class="modal" id="editJadwalModal">
-        <div class="modal-content">
+        <div class="modal-content modal-wide">
             <div class="modal-header">
                 <h2>Edit Jadwal Donor</h2>
                 <button type="button" class="modal-close" onclick="closeModal('editJadwalModal')">&times;</button>
@@ -230,15 +220,17 @@
             <form method="POST" action="index.php?page=admin-edit-jadwal">
                 <div class="modal-body">
                     <input type="hidden" name="id" id="editJadwalId">
-                    <div class="form-group">
-                        <label>Lokasi</label>
-                        <input type="text" name="lokasi" id="editJadwalLokasi" required>
+                    <div class="edit-jadwal-grid">
+                        <div class="form-group">
+                            <label>Lokasi</label>
+                            <input type="text" name="lokasi" id="editJadwalLokasi" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Tanggal</label>
+                            <input type="date" name="tanggal" id="editJadwalTanggal" required>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Tanggal</label>
-                        <input type="date" name="tanggal" id="editJadwalTanggal" required>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="edit-jadwal-grid">
                         <div class="form-group">
                             <label>Waktu Mulai</label>
                             <input type="time" name="waktu_mulai" id="editJadwalWaktuMulai" required>
@@ -248,9 +240,24 @@
                             <input type="time" name="waktu_selesai" id="editJadwalWaktuSelesai" required>
                         </div>
                     </div>
+                    <div class="edit-jadwal-grid">
+                        <div class="form-group">
+                            <label>Target Pendonor</label>
+                            <input type="number" name="target" id="editJadwalTarget" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Status Kegiatan</label>
+                            <select name="status" id="editJadwalStatus" class="form-control" required>
+                                <option value="Akan Datang">Akan Datang</option>
+                                <option value="Sedang Berlangsung">Sedang Berlangsung</option>
+                                <option value="Selesai">Selesai</option>
+                                <option value="Dibatalkan">Dibatalkan</option>
+                            </select>
+                        </div>
+                    </div>
                     <div class="form-group">
-                        <label>Target Pendonor</label>
-                        <input type="number" name="target" id="editJadwalTarget" min="1" required>
+                        <label>Catatan</label>
+                        <textarea name="catatan" id="editJadwalCatatan" class="form-control" rows="2"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -261,12 +268,7 @@
         </div>
     </div>
 
-    <?php if (!empty($_SESSION['success'])): ?>
-    <script>alert('<?= addslashes($_SESSION['success']) ?>'); <?php unset($_SESSION['success']); ?></script>
-    <?php endif; ?>
-    <?php if (!empty($_SESSION['error'])): ?>
-    <script>alert('Error: <?= addslashes($_SESSION['error']) ?>'); <?php unset($_SESSION['error']); ?></script>
-    <?php endif; ?>
+    <?php render_alerts(); ?>
 
     <script src="assets/js/sidebar.js"></script>
     <script src="assets/js/modals.js"></script>
@@ -278,17 +280,52 @@
             document.getElementById('editJadwalWaktuMulai').value = data.waktu_mulai || '';
             document.getElementById('editJadwalWaktuSelesai').value = data.waktu_selesai || '';
             document.getElementById('editJadwalTarget').value  = data.target || '';
+            document.getElementById('editJadwalStatus').value  = data.status || 'Akan Datang';
+            document.getElementById('editJadwalCatatan').value = data.catatan || '';
             openModal('editJadwalModal');
         }
         function openDetailJadwalModal(data) {
+            let status = data.status || 'Akan Datang';
+            let statusClass = 'badge-info';
+            if (status.toLowerCase() === 'selesai') statusClass = 'badge-success';
+            else if (status.toLowerCase() === 'dibatalkan') statusClass = 'badge-danger';
+            else if (status.toLowerCase() === 'sedang berlangsung') statusClass = 'badge-warning';
+
             const html = `
-                <div class="detail-row"><span class="detail-label">Lokasi</span>${data.lokasi || '-'}</div>
-                <div class="detail-row"><span class="detail-label">Tanggal</span>${data.tanggal || '-'}</div>
-                <div class="detail-row"><span class="detail-label">Waktu</span>${data.waktu_mulai || '-'} s.d. ${data.waktu_selesai || '-'}</div>
-                <div class="detail-row"><span class="detail-label">Target</span>${data.target || 0} orang</div>
-                <div class="detail-row"><span class="detail-label">Terdaftar</span>${data.terdaftar || 0} orang</div>
-                <div class="detail-row"><span class="detail-label">Status</span>${data.status || '-'}</div>
-                <div class="detail-row"><span class="detail-label">Catatan</span>${data.catatan || '-'}</div>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <p class="detail-label">Lokasi Penyelenggaraan</p>
+                        <p class="detail-value">${data.lokasi || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Tanggal Pelaksanaan</p>
+                        <p class="detail-value">${data.tanggal || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Waktu</p>
+                        <p class="detail-value">${data.waktu_mulai ? data.waktu_mulai.substring(0,5) : '-'} s.d. ${data.waktu_selesai ? data.waktu_selesai.substring(0,5) : '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Target Pendonor</p>
+                        <p class="detail-value">${data.target || 0} orang</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Jumlah Pendaftar</p>
+                        <p class="detail-value">${data.terdaftar || 0} orang</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Status Kegiatan</p>
+                        <p class="detail-value"><span class="badge ${statusClass}">${status}</span></p>
+                    </div>
+                    <div class="detail-item full-width">
+                        <p class="detail-label">Deskripsi / Lokasi Detail</p>
+                        <p class="detail-value">${data.lokasi_detail || data.lokasi || '-'}</p>
+                    </div>
+                    <div class="detail-item full-width">
+                        <p class="detail-label">Catatan</p>
+                        <p class="detail-value">${data.catatan || 'Belum diatur'}</p>
+                    </div>
+                </div>
             `;
             document.getElementById('detailJadwalBody').innerHTML = html;
             openModal('detailJadwalModal');
