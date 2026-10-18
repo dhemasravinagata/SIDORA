@@ -1,29 +1,34 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+namespace App\Models;
 
-return new class extends Migration
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class PermintaanDarahDetail extends Model
 {
-    public function up(): void
+    use HasFactory;
+
+    protected $table = 'permintaan_darah_detail';
+
+    protected $fillable = [
+        'permintaan_id',
+        'golongan',
+        'rhesus',
+        'jumlah',
+    ];
+
+    protected $casts = [
+        'jumlah' => 'integer',
+    ];
+
+    public function permintaan()
     {
-        Schema::create('permintaan_darah', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->enum('status', ['Pending', 'Disetujui', 'Ditolak', 'Dikirim'])->default('Pending');
-            $table->string('prioritas', 50)->default('Biasa');
-            $table->text('keterangan')->nullable();
-            $table->text('alasan_tolak')->nullable();
-            $table->date('tanggal_tolak')->nullable();
-            $table->string('kurir', 191)->nullable();
-            $table->date('tanggal_kirim')->nullable();
-            $table->timestamps();
-        });
+        return $this->belongsTo(PermintaanDarah::class, 'permintaan_id');
     }
 
-    public function down(): void
+    public function getLabelAttribute(): string
     {
-        Schema::dropIfExists('permintaan_darah');
+        return "{$this->golongan}{$this->rhesus}";
     }
-};
+}
