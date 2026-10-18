@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="{{ asset('/') }}">
     <title>Stok Darah - SIDORA Admin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -134,6 +135,8 @@
                     <h1>Monitoring Stok Darah</h1>
                 </div>
             </div>
+
+            <?php render_alerts(); ?>
 
             <div class="dashboard-grid">
                 <div class="stat-card">
@@ -282,6 +285,7 @@
                 <button class="modal-close" onclick="closeModal('alertStokModal')">&times;</button>
             </div>
             <form action="index.php?page=admin-alert-stok" method="POST" id="alertStokForm">
+                @csrf
                 <div class="modal-body">
                     <p>Golongan Darah: <strong id="alert-gol"></strong></p>
                     <p>Sisa Stok: <strong id="alert-qty" style="color: red;"></strong> kantong</p>
@@ -304,6 +308,7 @@
                 <button class="modal-close" onclick="closeModal('pesanStokModal')">&times;</button>
             </div>
             <form action="index.php?page=admin-pesan-stok" method="POST" id="pesanStokForm">
+                @csrf
                 <div class="modal-body">
                     <p>Pesan tambahan untuk Golongan Darah: <strong id="pesan-gol"></strong> (Stok saat ini: <span id="pesan-qty"></span>)</p>
                     <input type="hidden" name="golongan" id="pesan-input-gol">
