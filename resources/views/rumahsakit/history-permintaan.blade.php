@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="{{ asset('/') }}">
     <title>Riwayat Permintaan - SIDORA</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -127,6 +128,8 @@
                 </div>
             </div>
 
+            <?php render_alerts(); ?>
+
             <div class="filter-section">
                 <div class="filter-group" style="flex: 2; min-width: 200px;">
                     <label for="searchHistory">Cari Permintaan</label>
@@ -138,6 +141,8 @@
                         <option value="">Semua Status</option>
                         <option value="Pending">Pending</option>
                         <option value="Disetujui">Disetujui</option>
+                        <option value="Dikirim">Dikirim</option>
+                        <option value="Diterima">Diterima</option>
                         <option value="Ditolak">Ditolak</option>
                     </select>
                 </div>
@@ -171,16 +176,15 @@
                         <tbody>
                             <?php if (!empty($permintaanList)): $no=1; foreach ($permintaanList as $permintaan): 
                                 $statusClass = 'badge-warning';
-                                $statusIcon = '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>';
-                                if (strtolower($permintaan['status']) == 'disetujui' || strtolower($permintaan['status']) == 'approved') {
+                                $statusLower = strtolower($permintaan['status'] ?? 'pending');
+                                if ($statusLower == 'disetujui' || $statusLower == 'approved') {
                                     $statusClass = 'badge-success';
-                                    $statusIcon = '<polyline points="20 6 9 17 4 12"/>';
-                                } elseif (strtolower($permintaan['status']) == 'ditolak' || strtolower($permintaan['status']) == 'rejected') {
+                                } elseif ($statusLower == 'ditolak' || $statusLower == 'rejected') {
                                     $statusClass = 'badge-danger';
-                                    $statusIcon = '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>';
-                                } elseif (strtolower($permintaan['status']) == 'dikirim' || strtolower($permintaan['status']) == 'sent') {
-                                    $statusClass = 'badge-success';
-                                    $statusIcon = '<rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>';
+                                } elseif ($statusLower == 'dikirim' || $statusLower == 'sent') {
+                                    $statusClass = 'badge-dikirim';
+                                } elseif ($statusLower == 'diterima' || $statusLower == 'selesai') {
+                                    $statusClass = 'badge-diterima';
                                 }
 
                                 $keterangan = $permintaan['keterangan'] ?? '';
@@ -223,7 +227,13 @@
                                     $catatan = trim($matches[1]);
                                 }
 
-                                $detailPermintaan = $permintaan;
+                                $detailPermintaan = is_array($permintaan) ? $permintaan : $permintaan->toArray();
+                                $detailPermintaan['id'] = $permintaan['id'];
+                                $detailPermintaan['status'] = $permintaan['status'];
+                                $detailPermintaan['kurir'] = $permintaan['kurir'] ?? null;
+                                $detailPermintaan['tanggal_kirim'] = !empty($permintaan['tanggal_kirim']) ? (is_string($permintaan['tanggal_kirim']) ? $permintaan['tanggal_kirim'] : $permintaan['tanggal_kirim']->format('Y-m-d')) : null;
+                                $detailPermintaan['tanggal_terima'] = !empty($permintaan['tanggal_terima']) ? (is_string($permintaan['tanggal_terima']) ? $permintaan['tanggal_terima'] : $permintaan['tanggal_terima']->format('Y-m-d')) : null;
+                                $detailPermintaan['penerima'] = $permintaan['penerima'] ?? null;
                                 $detailPermintaan['tujuan'] = $tujuan;
                                 $detailPermintaan['jenis_permintaan'] = $jenisPermintaan;
                                 $detailPermintaan['pasien_keperluan'] = $pasienAtauKeperluan;
@@ -247,6 +257,8 @@
                                             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                                         <?php elseif ($permintaan['status'] === 'Dikirim'): ?>
                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                                        <?php elseif ($permintaan['status'] === 'Diterima'): ?>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                                         <?php else: ?>
                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                                         <?php endif; ?>
@@ -255,6 +267,11 @@
                                 </td>
                                 <td>
                                     <div class="action-buttons">
+                                        <?php if ($permintaan['status'] === 'Dikirim'): ?>
+                                            <button type="button" class="btn btn-success btn-small" onclick='openKonfirmasiTerimaModal(<?= htmlspecialchars(json_encode($detailPermintaan), ENT_QUOTES, "UTF-8") ?>)' title="Konfirmasi bahwa darah telah diterima di Rumah Sakit">
+                                                <i data-lucide="check-circle"></i> <span>Konfirmasi Terima</span>
+                                            </button>
+                                        <?php endif; ?>
                                         <button class="btn btn-outline btn-small" onclick='openDetailPermintaanRsModal(<?= htmlspecialchars(json_encode($detailPermintaan), ENT_QUOTES, "UTF-8") ?>)'>
                                             <i data-lucide="eye"></i> Detail
                                         </button>
@@ -285,10 +302,73 @@
     </div>
 
 
+    <div class="modal" id="konfirmasiTerimaModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Konfirmasi Penerimaan Darah</h2>
+                <button type="button" class="modal-close" onclick="closeModal('konfirmasiTerimaModal')">&times;</button>
+            </div>
+            <form action="index.php?page=rs-konfirmasi-terima" method="POST">
+                @csrf
+                <input type="hidden" name="permintaan_id" id="terimaPermintaanId">
+                <div class="modal-body">
+                    <div style="background-color: #ecfdf5; border-left: 4px solid #10b981; padding: 12px 14px; border-radius: 6px; margin-bottom: 1.25rem;">
+                        <p style="margin: 0; font-size: 13px; color: #065f46; font-weight: 500; line-height: 1.4;">
+                            Pastikan fisik kantong darah telah sampai di Rumah Sakit dan diperiksa kesesuaiannya sebelum melakukan konfirmasi.
+                        </p>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label style="font-weight: 600; font-size: 13px; color: #374151;">Ringkasan Permintaan</label>
+                        <div id="terimaRingkasan" style="background: #f9fafb; padding: 10px; border-radius: 6px; font-size: 13px; color: #1f2937; border: 1px solid #e5e7eb;">-</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label for="terimaPenerima" style="font-weight: 600; font-size: 13px; color: #374151;">Nama Penerima / Staf BDRS</label>
+                        <input type="text" name="penerima" id="terimaPenerima" class="form-control" placeholder="Contoh: Ns. Siti / Staf BDRS" value="<?= htmlspecialchars(Auth::user()?->name ?? '') ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="terimaCatatan" style="font-weight: 600; font-size: 13px; color: #374151;">Catatan Penerimaan (Opsional)</label>
+                        <textarea name="catatan_terima" id="terimaCatatan" class="form-control" rows="2" placeholder="Contoh: Darah diterima dalam kondisi baik pada coolbox suhu 4°C"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-gray" onclick="closeModal('konfirmasiTerimaModal')"><i data-lucide="x"></i> <span>Batal</span></button>
+                    <button type="submit" class="btn btn-success"><i data-lucide="check-circle"></i> <span>Ya, Konfirmasi Diterima</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
+        let currentDetailData = null;
+
+        function openKonfirmasiTerimaModal(data) {
+            currentDetailData = data;
+            const id = (typeof data === 'object' && data !== null) ? (data.id || '') : data;
+            document.getElementById('terimaPermintaanId').value = id;
+
+            if (typeof data === 'object' && data !== null) {
+                const gol = data.golongan ? (data.golongan + ' ' + (data.rhesus || '')) : '-';
+                const kantong = data.detail_jumlah || data.jumlah || 1;
+                const tujuan = data.jenis_permintaan || 'Darah Pasien';
+                const keperluan = data.pasien_keperluan || '-';
+                document.getElementById('terimaRingkasan').innerHTML = `
+                    <div style="font-weight: 600; font-size: 14px; color: #111827;">Golongan: ${gol} &bull; ${kantong} Kantong</div>
+                    <div style="color: #6b7280; margin-top: 4px;">${tujuan}: <strong>${keperluan}</strong></div>
+                    <div style="color: #9ca3af; font-size: 12px; margin-top: 2px;">ID Permintaan: #REQ-${id}</div>
+                `;
+            } else {
+                document.getElementById('terimaRingkasan').innerHTML = `Permintaan #REQ-${id}`;
+            }
+
+            document.getElementById('konfirmasiTerimaModal').classList.add('active');
+            if (window.lucide) { lucide.createIcons(); }
+        }
+
         function openDetailPermintaanRsModal(data) {
+            currentDetailData = data;
             let statusClass = 'badge-warning';
             if(data.status === 'Disetujui' || data.status === 'Dikirim') statusClass = 'badge-success';
+            else if(data.status === 'Diterima') statusClass = 'badge-diterima';
             else if(data.status === 'Ditolak') statusClass = 'badge-danger';
 
             const rawPrio = (data.prioritas || 'biasa').toLowerCase().trim();
@@ -362,7 +442,7 @@
             } else if (data.status === 'Dikirim') {
                 html += `
                     <div class="detail-item">
-                        <p class="detail-label">Kurir</p>
+                        <p class="detail-label">Kurir / Pengantar</p>
                         <p class="detail-value">${data.kurir || '-'}</p>
                     </div>
                     <div class="detail-item">
@@ -370,12 +450,42 @@
                         <p class="detail-value">${data.tanggal_kirim || '-'}</p>
                     </div>
                 `;
+            } else if (data.status === 'Diterima') {
+                html += `
+                    <div class="detail-item">
+                        <p class="detail-label">Kurir Pengantar</p>
+                        <p class="detail-value">${data.kurir || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Tanggal Dikirim</p>
+                        <p class="detail-value">${data.tanggal_kirim || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Tanggal Diterima</p>
+                        <p class="detail-value">${data.tanggal_terima || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Penerima di RS</p>
+                        <p class="detail-value">${data.penerima || '-'}</p>
+                    </div>
+                `;
             }
             
             html += `</div>`;
+
+            if (data.status === 'Dikirim') {
+                html += `
+                    <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end;">
+                        <button type="button" class="btn btn-success" onclick="closeModal('detailPermintaanModal'); openKonfirmasiTerimaModal(currentDetailData)">
+                            <i data-lucide="check-circle"></i> <span>Konfirmasi Darah Telah Diterima</span>
+                        </button>
+                    </div>
+                `;
+            }
             
             document.getElementById('detailBodyRS').innerHTML = html;
             document.getElementById('detailPermintaanModal').classList.add('active');
+            if (window.lucide) { lucide.createIcons(); }
         }
         function closeModal(id) {
             document.getElementById(id).classList.remove('active');
