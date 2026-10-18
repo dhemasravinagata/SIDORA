@@ -32,3 +32,4 @@ class StokDarahTest extends TestCase
         $this->assertTrue($stok->isLowStock());
     }
 }
+
