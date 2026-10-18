@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="{{ asset('/') }}">
     <title>Login - SIDORA</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,12 +26,46 @@
                 </div>
             </div>
 
-            <form class="login-form" id="loginForm" method="POST" action="index.php?page=login-process">
+            <?php $warnMsg = session('warning') ?: ($_SESSION['warning'] ?? null); ?>
+            <?php if ($warnMsg): ?>
+                <div class="alert-banner alert-warning" style="background: #FFFBEB; border: 1px solid #FCD34D; border-left: 5px solid #F59E0B; border-radius: 10px; padding: 14px 16px; margin-bottom: 22px; display: flex; gap: 12px; align-items: flex-start;">
+                    <i data-lucide="alert-triangle" style="width: 22px; height: 22px; color: #D97706; flex-shrink: 0; margin-top: 2px;"></i>
+                    <div style="text-align: left;">
+                        <div style="font-weight: 600; color: #92400E; font-size: 0.95rem; margin-bottom: 3px;">Akun Menunggu Verifikasi</div>
+                        <div style="color: #B45309; font-size: 0.86rem; line-height: 1.5;"><?= htmlspecialchars((string) $warnMsg) ?></div>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <?php $errMsg = session('error') ?: ($_SESSION['error'] ?? null); ?>
+            <?php if ($errMsg): ?>
+                <div class="alert-banner alert-error" style="background: #FEF2F2; border: 1px solid #FECACA; border-left: 5px solid #DC2626; border-radius: 10px; padding: 14px 16px; margin-bottom: 22px; display: flex; gap: 12px; align-items: flex-start;">
+                    <i data-lucide="alert-circle" style="width: 22px; height: 22px; color: #DC2626; flex-shrink: 0; margin-top: 2px;"></i>
+                    <div style="text-align: left;">
+                        <div style="font-weight: 600; color: #991B1B; font-size: 0.95rem; margin-bottom: 3px;">Gagal Masuk</div>
+                        <div style="color: #B91C1C; font-size: 0.86rem; line-height: 1.5;"><?= htmlspecialchars((string) $errMsg) ?></div>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <?php $succMsg = session('success') ?: ($_SESSION['success'] ?? null); ?>
+            <?php if ($succMsg): ?>
+                <div class="alert-banner alert-success" style="background: #F0FDF4; border: 1px solid #BBF7D0; border-left: 5px solid #16A34A; border-radius: 10px; padding: 14px 16px; margin-bottom: 22px; display: flex; gap: 12px; align-items: flex-start;">
+                    <i data-lucide="check-circle" style="width: 22px; height: 22px; color: #16A34A; flex-shrink: 0; margin-top: 2px;"></i>
+                    <div style="text-align: left;">
+                        <div style="font-weight: 600; color: #166534; font-size: 0.95rem; margin-bottom: 3px;">Pemberitahuan</div>
+                        <div style="color: #15803D; font-size: 0.86rem; line-height: 1.5;"><?= htmlspecialchars((string) $succMsg) ?></div>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <form class="login-form" id="loginForm" method="POST" action="{{ request()->has('page') ? 'index.php?page=login-process' : route('login.post') }}">
                 <?= csrf_field() ?>
+                <input type="hidden" name="page" value="login-process">
 
                 <div class="form-group">
                     <label for="email" class="required">Username atau Email</label>
-                    <input type="text" id="email" name="email" value="<?= htmlspecialchars(old('email')) ?>" placeholder="Masukkan username atau email" required autofocus>
+                    <input type="text" id="email" name="email" value="<?= htmlspecialchars((string) old('email')) ?>" placeholder="Masukkan username atau email" required autofocus>
                     <?php if (has_error('email')): ?>
                         <span class="error" style="color:#DC2626;font-size:0.8rem;display:block;margin-top:4px;"><?= htmlspecialchars(error('email')) ?></span>
                     <?php endif; ?>

@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="{{ asset('/') }}">
     <title>Dashboard Admin - SIDORA</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -95,6 +96,8 @@
                     </a>
                 </div>
             </div>
+
+            <?php render_alerts(); ?>
 
             <div class="dashboard-grid grid-3-cols">
                 <div class="stat-card">
@@ -239,6 +242,9 @@ Aktif Bertransaksi
                                             } elseif ($status == 'Dikirim' || $status == 'dikirim') {
                                                 $labelStatus = 'Dikirim';
                                                 $badgeClass = 'badge-dikirim';
+                                            } elseif ($status == 'Diterima' || $status == 'diterima') {
+                                                $labelStatus = 'Diterima';
+                                                $badgeClass = 'badge-diterima';
                                             } else {
                                                 $labelStatus = $status;
                                                 $badgeClass = 'badge-ditinjau';
@@ -252,6 +258,8 @@ Aktif Bertransaksi
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                                                 <?php elseif ($labelStatus === 'Dikirim'): ?>
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                                                <?php elseif ($labelStatus === 'Diterima'): ?>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                                                 <?php else: ?>
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                                                 <?php endif; ?>
@@ -322,6 +330,7 @@ Aktif Bertransaksi
                 <button type="button" class="modal-close" onclick="closeModals()">&times;</button>
             </div>
             <form action="index.php?page=admin-tolak-permintaan" method="POST">
+                @csrf
                 <div class="modal-body">
                     <input type="hidden" name="permintaan_id" id="tolakId">
                     <div class="form-group">
@@ -344,6 +353,7 @@ Aktif Bertransaksi
                 <button type="button" class="modal-close" onclick="closeModals()">&times;</button>
             </div>
             <form action="index.php?page=admin-kirim-permintaan" method="POST">
+                @csrf
                 <div class="modal-body">
                     <input type="hidden" name="permintaan_id" id="kirimId">
                     <div class="form-group">
@@ -401,6 +411,9 @@ Aktif Bertransaksi
             } else if (labelStatus === 'Dikirim' || labelStatus === 'dikirim') {
                 labelStatus = 'Dikirim';
                 badgeClass = 'badge-dikirim';
+            } else if (labelStatus === 'Diterima' || labelStatus === 'diterima') {
+                labelStatus = 'Diterima';
+                badgeClass = 'badge-diterima';
             }
 
             const rawPrio = (data.prioritas || 'biasa').toLowerCase().trim();
@@ -460,6 +473,25 @@ Aktif Bertransaksi
                     <div class="detail-item">
                         <p class="detail-label">Tanggal Kirim</p>
                         <p class="detail-value">${data.tanggal_kirim || '-'}</p>
+                    </div>
+                `;
+            } else if (data.status === 'Diterima') {
+                html += `
+                    <div class="detail-item">
+                        <p class="detail-label">Kurir Pengantar</p>
+                        <p class="detail-value">${data.kurir || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Tanggal Kirim</p>
+                        <p class="detail-value">${data.tanggal_kirim || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Tanggal Diterima RS</p>
+                        <p class="detail-value">${data.tanggal_terima || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Penerima di RS</p>
+                        <p class="detail-value">${data.penerima || '-'}</p>
                     </div>
                 `;
             }

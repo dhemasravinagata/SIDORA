@@ -332,18 +332,29 @@ class AdminController extends Controller
 
     public function tambahPetugasProcess(Request $request)
     {
+        if ($request->has('email')) {
+            $request->merge(['email' => strtolower(trim((string) $request->input('email')))]);
+        }
+        if ($request->has('username')) {
+            $request->merge(['username' => trim((string) $request->input('username'))]);
+        }
+        if ($request->has('nama')) {
+            $request->merge(['nama' => trim((string) $request->input('nama'))]);
+        }
+
         $validator = Validator::make($request->all(), [
             'nama'     => 'required|string|min:3|max:150',
-            'email'    => 'required|email|max:150|unique:users,email',
+            'email'    => 'required|string|email:rfc,filter|max:150|unique:users,email',
             'username' => 'required|string|min:3|max:50|unique:users,username',
             'password' => 'required|string|min:6',
             'telepon'  => 'nullable|string|min:6|max:20',
         ], [
             'nama.required'     => 'Nama petugas wajib diisi.',
             'email.required'    => 'Email petugas wajib diisi.',
-            'email.unique'      => 'Email sudah terdaftar.',
+            'email.email'       => 'Format email tidak valid (contoh: petugas@sidora.com).',
+            'email.unique'      => 'Email ":input" sudah terdaftar pada akun lain. Gunakan alamat email yang berbeda.',
             'username.required' => 'Username petugas wajib diisi.',
-            'username.unique'   => 'Username sudah digunakan oleh akun lain.',
+            'username.unique'   => 'Username ":input" sudah digunakan oleh akun lain.',
             'password.required' => 'Password wajib diisi.',
             'password.min'      => 'Password minimal harus 6 karakter.',
         ]);
@@ -375,17 +386,28 @@ class AdminController extends Controller
         $id = $id ?: $request->input('id');
         $user = User::findOrFail($id);
 
+        if ($request->has('email')) {
+            $request->merge(['email' => strtolower(trim((string) $request->input('email')))]);
+        }
+        if ($request->has('username')) {
+            $request->merge(['username' => trim((string) $request->input('username'))]);
+        }
+        if ($request->has('nama')) {
+            $request->merge(['nama' => trim((string) $request->input('nama'))]);
+        }
+
         $validator = Validator::make($request->all(), [
             'nama'     => 'required|string|min:3|max:150',
-            'email'    => "required|email|max:150|unique:users,email,{$user->id}",
+            'email'    => "required|string|email:rfc,filter|max:150|unique:users,email,{$user->id}",
             'username' => "required|string|min:3|max:50|unique:users,username,{$user->id}",
             'telepon'  => 'nullable|string|min:6|max:20',
         ], [
             'nama.required'     => 'Nama petugas wajib diisi.',
             'email.required'    => 'Email petugas wajib diisi.',
-            'email.unique'      => 'Email sudah digunakan akun lain.',
+            'email.email'       => 'Format email tidak valid (contoh: petugas@sidora.com).',
+            'email.unique'      => 'Email ":input" sudah digunakan oleh akun lain.',
             'username.required' => 'Username wajib diisi.',
-            'username.unique'   => 'Username sudah digunakan akun lain.',
+            'username.unique'   => 'Username ":input" sudah digunakan oleh akun lain.',
         ]);
 
         if ($validator->fails()) {
@@ -414,6 +436,11 @@ class AdminController extends Controller
     public function hapusPetugasProcess(Request $request, $id = null)
     {
         $id = $id ?: $request->input('id', $request->query('id'));
+        if ((int) $id === (int) Auth::id()) {
+            return redirect()->route('admin.kelola-petugas')
+                ->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
+        }
+
         $user = User::findOrFail($id);
         $nama = $user->name;
         $user->delete();
@@ -500,7 +527,7 @@ class AdminController extends Controller
         $target       = (int) $request->input('target');
         $waktuMulai   = $request->input('waktu_mulai', $request->input('jam_mulai', '08:00'));
         $waktuSelesai = $request->input('waktu_selesai', $request->input('jam_selesai', '14:00'));
-        $status       = $request->input('status', 'Akan Datang');
+        $status       = trim($request->input('status', '')) ?: 'Akan Datang';
         $catatan      = trim($request->input('catatan', ''));
 
         JadwalDonor::create([
