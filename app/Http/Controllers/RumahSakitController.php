@@ -27,7 +27,8 @@ class RumahSakitController extends Controller
         $statistics = [
             'total_permintaan'    => $permintaanColl->count(),
             'permintaan_ditinjau' => $permintaanColl->where('status', 'Pending')->count(),
-            'disetujui'           => $permintaanColl->whereIn('status', ['Disetujui', 'Dikirim'])->count(),
+            'disetujui'           => $permintaanColl->whereIn('status', ['Disetujui', 'Dikirim', 'Diterima'])->count(),
+            'diterima'            => $permintaanColl->where('status', 'Diterima')->count(),
             'permintaan_ditolak'  => $permintaanColl->where('status', 'Ditolak')->count(),
         ];
 
@@ -47,30 +48,63 @@ class RumahSakitController extends Controller
         $userId = Auth::id();
         $tujuan = trim($request->input('tujuan_permintaan', 'pasien'));
 
+        if ($request->has('prioritas')) {
+            $rawPrio = strtolower(trim((string) $request->input('prioritas')));
+            $mappedPrio = match ($rawPrio) {
+                'darurat', 'emergency', 'sangat mendesak' => 'Darurat',
+                'segera', 'urgent', 'penting' => 'Segera',
+                'biasa', 'standar' => 'Biasa',
+                default => ucfirst($rawPrio),
+            };
+            $request->merge(['prioritas' => $mappedPrio]);
+        }
+
+        if ($request->has('golongan')) {
+            $rawGol = strtoupper(trim((string) $request->input('golongan')));
+            if (in_array($rawGol, ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])) {
+                $base = substr($rawGol, 0, -1);
+                $rh = substr($rawGol, -1);
+                $request->merge([
+                    'golongan' => $base,
+                    'rhesus'   => $request->filled('rhesus') ? $request->input('rhesus') : $rh,
+                ]);
+            } else {
+                $request->merge(['golongan' => $rawGol]);
+            }
+        }
+
         $rules = [
             'golongan'  => 'required|in:A,B,AB,O',
             'rhesus'    => 'required|in:+,-',
-            'jumlah'    => 'required|integer|min:1',
-            'prioritas' => 'required|in:Biasa,Penting,Darurat,Sangat Mendesak',
+            'jumlah'    => 'required|integer|min:1|max:100',
+            'prioritas' => 'required|in:Biasa,Segera,Darurat,Penting,Sangat Mendesak,biasa,segera,darurat',
         ];
 
         $messages = [
-            'golongan.required'  => 'Golongan darah wajib dipilih.',
-            'rhesus.required'    => 'Rhesus darah wajib dipilih.',
-            'jumlah.required'    => 'Jumlah kantong darah wajib diisi angka positif.',
-            'prioritas.required' => 'Tingkat prioritas permintaan wajib ditentukan.',
+            'golongan.required'     => 'Golongan darah wajib dipilih.',
+            'golongan.in'           => 'Golongan darah tidak valid.',
+            'rhesus.required'       => 'Rhesus darah wajib dipilih.',
+            'rhesus.in'             => 'Rhesus darah tidak valid.',
+            'jumlah.required'       => 'Jumlah kantong darah wajib diisi angka positif.',
+            'jumlah.integer'        => 'Jumlah kantong darah harus berupa angka.',
+            'jumlah.min'            => 'Jumlah kantong darah minimal 1 kantong.',
+            'jumlah.max'            => 'Jumlah kantong darah maksimal 100 kantong per pengajuan.',
+            'prioritas.required'    => 'Tingkat prioritas permintaan wajib ditentukan.',
+            'prioritas.in'          => 'Pilihan prioritas tidak valid.',
+            'nama_pasien.required'  => 'Nama pasien penerima darah wajib diisi.',
+            'nama_pasien.min'       => 'Nama pasien minimal 2 karakter.',
+            'no_pasien.required'    => 'Nomor Rekam Medis (RM) pasien wajib diisi.',
+            'ruangan.required'      => 'Ruangan/Kamar perawatan pasien wajib diisi.',
+            'ruangan.min'           => 'Ruangan perawatan minimal 1 karakter.',
+            'dokter.required'       => 'Nama dokter penanggung jawab wajib diisi.',
+            'dokter.min'            => 'Nama dokter minimal 2 karakter.',
         ];
 
         if ($tujuan === 'pasien') {
-            $rules['nama_pasien'] = 'required|string|min:3|max:100';
-            $rules['no_pasien']   = 'required|string|min:2|max:50';
-            $rules['ruangan']     = 'required|string|min:2|max:50';
-            $rules['dokter']      = 'required|string|min:3|max:100';
-
-            $messages['nama_pasien.required'] = 'Nama pasien penerima darah wajib diisi.';
-            $messages['no_pasien.required']   = 'Nomor Rekam Medis (RM) pasien wajib diisi.';
-            $messages['ruangan.required']     = 'Ruangan/Kamar perawatan pasien wajib diisi.';
-            $messages['dokter.required']      = 'Nama dokter penanggung jawab wajib diisi.';
+            $rules['nama_pasien'] = 'required|string|min:2|max:100';
+            $rules['no_pasien']   = 'required|string|min:1|max:50';
+            $rules['ruangan']     = 'required|string|min:1|max:50';
+            $rules['dokter']      = 'required|string|min:2|max:100';
         }
 
         $validator = Validator::make($request->all(), $rules, $messages);
@@ -144,6 +178,54 @@ class RumahSakitController extends Controller
             ->get();
 
         return view('rumahsakit.history-permintaan', compact('permintaanList'));
+    }
+
+    public function konfirmasiTerima(Request $request)
+    {
+        $id = $request->input('permintaan_id', $request->input('id', $request->query('id')));
+        if (! $id) {
+            return redirect()->route('rs.history-permintaan')->with('error', 'ID permintaan darah tidak valid.');
+        }
+
+        $userId = Auth::id();
+        /** @var PermintaanDarah|null $permintaan */
+        $permintaan = PermintaanDarah::where('id', $id)->where('user_id', $userId)->first();
+
+        if (! $permintaan) {
+            return redirect()->route('rs.history-permintaan')->with('error', 'Data permintaan darah tidak ditemukan.');
+        }
+
+        if ($permintaan->status === 'Diterima') {
+            return redirect()->route('rs.history-permintaan')->with('info', "Permintaan darah #REQ-{$id} sudah dikonfirmasi diterima sebelumnya.");
+        }
+
+        if ($permintaan->status !== 'Dikirim') {
+            return redirect()->route('rs.history-permintaan')->with('warning', 'Hanya permintaan darah yang sedang berstatus Dikirim yang dapat dikonfirmasi penerimaannya.');
+        }
+
+        $penerima = trim((string) $request->input('penerima'));
+        if (empty($penerima)) {
+            $penerima = Auth::user()?->name ?? 'Pihak Rumah Sakit';
+        }
+
+        $catatan = trim((string) $request->input('catatan_terima'));
+        $keteranganLama = $permintaan->keterangan ?? '';
+        $keteranganBaru = $keteranganLama;
+        if (! empty($catatan)) {
+            $keteranganBaru .= " | Diterima oleh: {$penerima}. Catatan Terima: {$catatan}";
+        }
+
+        $permintaan->update([
+            'status'         => 'Diterima',
+            'tanggal_terima' => now()->toDateString(),
+            'penerima'       => $penerima,
+            'keterangan'     => $keteranganBaru,
+        ]);
+
+        Log::info("Rumah Sakit ID #{$userId} mengonfirmasi penerimaan darah #REQ-{$id} oleh: {$penerima}");
+
+        return redirect()->route('rs.history-permintaan')
+            ->with('success', "Konfirmasi berhasil! Darah pesanan (#REQ-{$id}) telah diterima oleh {$penerima}. Status pada Admin juga telah diperbarui menjadi Diterima.");
     }
 
     public function stokDarah()
