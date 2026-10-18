@@ -26,6 +26,12 @@ class Pendonor extends Model
         'rhesus',
         'status',
         'tgl_donor',
+        'tekanan_darah',
+        'detak_jantung',
+        'hemoglobin',
+        'suhu_tubuh',
+        'kesehatan_umum',
+        'catatan',
     ];
 
     protected $casts = [

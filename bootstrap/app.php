@@ -21,5 +21,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectUsersTo(fn () => route('dashboard'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, \Illuminate\Http\Request $request) {
+            return redirect()->route('login')
+                ->with('warning', 'Sesi formulir telah kedaluwarsa demi keamanan. Silakan coba masuk kembali.');
+        });
     })->create();

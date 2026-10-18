@@ -49,18 +49,26 @@ class AdminManagementTest extends TestCase
     {
         $this->actingAs($this->getAdmin());
 
+        // Check that form-jadwal does NOT contain status field
+        $formResponse = $this->get('/index.php?page=admin-form-jadwal');
+        $formResponse->assertStatus(200);
+        $formResponse->assertDontSee('name="status"', false);
+
         $response = $this->post('/admin/tambah-jadwal', [
             'lokasi'        => 'Aula Gedung Serbaguna Unila',
             'tanggal'       => now()->addDays(5)->toDateString(),
             'target'        => 120,
             'waktu_mulai'   => '08:00',
             'waktu_selesai' => '13:00',
-            'status'        => 'Akan Datang',
+            // Notice: status is NOT provided
             'catatan'       => 'Kerjasama KSR PMI Unit Unila',
         ]);
 
         $response->assertRedirect(route('admin.jadwal-donor'));
-        $this->assertDatabaseHas('jadwal_donor', ['lokasi' => 'Aula Gedung Serbaguna Unila']);
+        $this->assertDatabaseHas('jadwal_donor', [
+            'lokasi' => 'Aula Gedung Serbaguna Unila',
+            'status' => 'Akan Datang',
+        ]);
     }
 
     public function test_admin_can_approve_hospital_account(): void
@@ -89,5 +97,44 @@ class AdminManagementTest extends TestCase
         $response = $this->get('/admin/export-semua');
         $response->assertStatus(200);
         $this->assertStringContainsString('text/csv', $response->headers->get('Content-Type'));
+    }
+
+    public function test_admin_kelola_user_page_renders_filters_and_containers(): void
+    {
+        $this->actingAs($this->getAdmin());
+
+        $response = $this->get('/index.php?page=admin-kelola-petugas');
+        $response->assertStatus(200);
+        $response->assertSee('id="filterTarget"', false);
+        $response->assertSee('id="searchUser"', false);
+        $response->assertSee('id="filterStatus"', false);
+        $response->assertSee('id="resetUserFilter"', false);
+        $response->assertSee('id="containerRumahSakit"', false);
+        $response->assertSee('id="containerPetugas"', false);
+        $response->assertSee('id="tabelRumahSakit"', false);
+        $response->assertSee('id="tabelPetugas"', false);
+    }
+
+    public function test_admin_permintaan_darah_page_renders_filters(): void
+    {
+        $this->actingAs($this->getAdmin());
+
+        $response = $this->get('/index.php?page=admin-permintaan-darah');
+        $response->assertStatus(200);
+        $response->assertSee('id="searchPermintaan"', false);
+        $response->assertSee('id="filterStatus"', false);
+        $response->assertSee('id="filterPrioritas"', false);
+        $response->assertSee('id="resetBtn"', false);
+    }
+
+    public function test_admin_jadwal_donor_page_renders_filters(): void
+    {
+        $this->actingAs($this->getAdmin());
+
+        $response = $this->get('/index.php?page=admin-jadwal-donor');
+        $response->assertStatus(200);
+        $response->assertSee('id="searchJadwal"', false);
+        $response->assertSee('id="filterTanggal"', false);
+        $response->assertSee('id="resetJadwalBtn"', false);
     }
 }

@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="{{ asset('/') }}">
     <title>Lihat Daftar Pendonor - SIDORA Admin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -92,7 +93,7 @@
                 </div>
 
                 <div class="page-title">
-                    <h1>Daftar Pendonor (Read Only)</h1>
+                    <h1>Daftar Pendonor</h1>
                 </div>
             </div>
 
@@ -105,11 +106,15 @@
                 <div class="filter-group">
                     <label for="filterGolDarah">Golongan Darah</label>
                     <select id="filterGolDarah">
-                        <option value="">Semua</option>
-                        <option value="A">A</option>
-                        <option value="B">B</option>
-                        <option value="AB">AB</option>
-                        <option value="O">O</option>
+                        <option value="">Semua Golongan Darah</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
                     </select>
                 </div>
 
@@ -149,8 +154,11 @@
                             <?php if (!empty($pendonorList) && count($pendonorList) > 0): $no = 1; foreach ($pendonorList as $pendonor): ?>
                                 <?php 
                                     $gol = $pendonor['golongan'] ?? '';
+                                    $darah = strtoupper(trim(($pendonor['golongan'] ?? '') . ($pendonor['rhesus'] ?? '')));
                                 ?>
-                                <tr>
+                                <tr data-golongan="<?= htmlspecialchars($gol) ?>"
+                                    data-darah="<?= htmlspecialchars($darah) ?>"
+                                    data-status="<?= htmlspecialchars(strtolower($pendonor['status'] ?? 'aktif')) ?>">
                                     <td><?= $no++ ?></td>
                                     <td><?= htmlspecialchars(!empty($pendonor['nama']) ? $pendonor['nama'] : '-') ?></td>
                                     <td><?= htmlspecialchars((!empty($pendonor['golongan']) ? $pendonor['golongan'] : '-') . (!empty($pendonor['rhesus']) ? $pendonor['rhesus'] : '')) ?></td>
@@ -265,35 +273,56 @@
             
             function filterTable() {
                 const searchVal = searchInput.value.toLowerCase().trim();
-                const golVal = golSelect.value.toLowerCase();
-                const statusVal = statusSelect.value.toLowerCase();
+                const golVal = golSelect.value.toUpperCase().trim();
+                const statusVal = statusSelect.value.toLowerCase().trim();
                 
                 rows.forEach(row => {
                     if(row.cells.length <= 1) return;
                     
                     const text = row.textContent.toLowerCase();
-                    // Col 3 = Golongan Darah (index 2)
-                    const golCell = row.cells[2];
-                    const golText = golCell ? golCell.textContent.toLowerCase().trim() : '';
-                    
-                    // Status Badge
-                    const statusBadge = row.querySelector('.badge');
-                    const statusText = statusBadge ? statusBadge.textContent.toLowerCase().trim() : '';
+                    const rowDarah = (row.getAttribute('data-darah') || '').toUpperCase().trim();
+                    const rowGol = (row.getAttribute('data-golongan') || '').toUpperCase().trim();
+                    const rowStatus = (row.getAttribute('data-status') || '').toLowerCase().trim();
                     
                     const matchSearch = searchVal === '' || text.includes(searchVal);
-                    const matchGol = golVal === '' || golText === golVal;
-                    const matchStatus = statusVal === '' || statusText === statusVal || (statusVal === 'nonaktif' && statusText === 'non-aktif');
+                    
+                    let matchGol = false;
+                    if (!golVal) {
+                        matchGol = true;
+                    } else if (golVal === rowDarah) {
+                        matchGol = true;
+                    } else if (golVal === rowGol) {
+                        matchGol = true;
+                    }
+
+                    let matchStatus = false;
+                    if (!statusVal) {
+                        matchStatus = true;
+                    } else if (statusVal === rowStatus) {
+                        matchStatus = true;
+                    } else if (statusVal === 'nonaktif' && (rowStatus === 'non-aktif' || rowStatus === 'nonaktif')) {
+                        matchStatus = true;
+                    }
                     
                     row.style.display = (matchSearch && matchGol && matchStatus) ? '' : 'none';
                 });
             }
             
-            if(searchInput) searchInput.addEventListener('input', filterTable);
+            if(searchInput) {
+                searchInput.addEventListener('input', filterTable);
+                searchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        filterTable();
+                    }
+                });
+            }
             if(golSelect) golSelect.addEventListener('change', filterTable);
             if(statusSelect) statusSelect.addEventListener('change', filterTable);
             
             if(resetBtn) {
-                resetBtn.addEventListener('click', function() {
+                resetBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
                     searchInput.value = '';
                     golSelect.value = '';
                     statusSelect.value = '';

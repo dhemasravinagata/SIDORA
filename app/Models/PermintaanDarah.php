@@ -20,11 +20,14 @@ class PermintaanDarah extends Model
         'tanggal_tolak',
         'kurir',
         'tanggal_kirim',
+        'tanggal_terima',
+        'penerima',
     ];
 
     protected $casts = [
-        'tanggal_tolak' => 'date',
-        'tanggal_kirim' => 'date',
+        'tanggal_tolak'  => 'date',
+        'tanggal_kirim'  => 'date',
+        'tanggal_terima' => 'date',
     ];
 
     protected $appends = [
@@ -96,8 +99,13 @@ class PermintaanDarah extends Model
         return $this->status === 'Dikirim';
     }
 
+    public function isDiterima(): bool
+    {
+        return $this->status === 'Diterima';
+    }
+
     public function isSelesai(): bool
     {
-        return $this->status === 'Selesai';
+        return $this->status === 'Selesai' || $this->status === 'Diterima';
     }
 }

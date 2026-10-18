@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="{{ asset('/') }}">
     <title>Daftar Rumah Sakit - SIDORA</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,22 +24,23 @@
                 </div>
             </div>
 
-            <form method="POST" action="index.php?page=register-rs-process" class="register-form">
+            <form method="POST" action="{{ request()->has('page') ? 'index.php?page=register-rs-process' : route('register.rs.post') }}" class="register-form">
                 <?= csrf_field() ?>
+                <input type="hidden" name="page" value="register-rs-process">
                 
                 <div class="form-row" style="display: grid; gap: var(--spacing-md);">
                     <div class="form-group">
                         <label class="required">Nama Rumah Sakit</label>
                         <input type="text" name="nama_rs" value="<?= htmlspecialchars(old('nama_rs')) ?>" placeholder="Contoh: RSUD Dr. H. Abdul Moeloek" required>
                         <?php if (has_error('nama_rs')): ?>
-                            <span class="error" style="color:#DC2626;font-size:0.8rem;display:block;margin-top:4px;"><?= htmlspecialchars(error('nama_rs')) ?></span>
+                            <span class="error" style="color:#DC2626;font-size:0.8rem;display:block;margin-top:4px;font-weight:500;"><?= htmlspecialchars(error('nama_rs')) ?></span>
                         <?php endif; ?>
                     </div>
                     <div class="form-group">
                         <label>Username</label>
                         <input type="text" name="username" value="<?= htmlspecialchars(old('username')) ?>" placeholder="Username untuk login (opsional)">
                         <?php if (has_error('username')): ?>
-                            <span class="error" style="color:#DC2626;font-size:0.8rem;display:block;margin-top:4px;"><?= htmlspecialchars(error('username')) ?></span>
+                            <span class="error" style="color:#DC2626;font-size:0.8rem;display:block;margin-top:4px;font-weight:500;"><?= htmlspecialchars(error('username')) ?></span>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -46,16 +48,19 @@
                 <div class="form-row" style="display: grid; gap: var(--spacing-md);">
                     <div class="form-group">
                         <label class="required">Email</label>
-                        <input type="email" name="email" value="<?= htmlspecialchars(old('email')) ?>" placeholder="Email resmi rumah sakit" required>
+                        <input type="email" name="email" value="<?= htmlspecialchars(old('email')) ?>" placeholder="Contoh: rs.abdulmoeloek@gmail.com" required>
                         <?php if (has_error('email')): ?>
-                            <span class="error" style="color:#DC2626;font-size:0.8rem;display:block;margin-top:4px;"><?= htmlspecialchars(error('email')) ?></span>
+                            <span class="error" style="color:#DC2626;font-size:0.8rem;display:block;margin-top:4px;font-weight:500;">
+                                <?= htmlspecialchars(error('email')) ?>
+                            </span>
                         <?php endif; ?>
+                        <small style="color: #64748B; font-size: 0.78rem; display: block; margin-top: 4px;">Pastikan email aktif dan belum pernah didaftarkan pada akun SIDORA mana pun.</small>
                     </div>
                     <div class="form-group">
                         <label class="required">Password</label>
                         <input type="password" name="password" placeholder="Password akun (min. 6 karakter)" required>
                         <?php if (has_error('password')): ?>
-                            <span class="error" style="color:#DC2626;font-size:0.8rem;display:block;margin-top:4px;"><?= htmlspecialchars(error('password')) ?></span>
+                            <span class="error" style="color:#DC2626;font-size:0.8rem;display:block;margin-top:4px;font-weight:500;"><?= htmlspecialchars(error('password')) ?></span>
                         <?php endif; ?>
                     </div>
                 </div>

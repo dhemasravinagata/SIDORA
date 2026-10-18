@@ -17,6 +17,11 @@ class RiwayatDonasi extends Model
         'rhesus',
         'jumlah',
         'tekanan_darah',
+        'detak_jantung',
+        'hemoglobin',
+        'suhu_tubuh',
+        'kesehatan_umum',
+        'catatan',
         'status',
         'tanggal',
     ];
@@ -31,6 +36,9 @@ class RiwayatDonasi extends Model
         'nik',
         'telepon',
         'alamat',
+        'jenis_kelamin',
+        'tanggal_lahir',
+        'pekerjaan',
         'label',
     ];
 
@@ -41,7 +49,10 @@ class RiwayatDonasi extends Model
 
     public function getNamaPendonorAttribute(): string
     {
-        return $this->pendonor?->nama ?? '-';
+        $nama = $this->pendonor?->nama ?? '-';
+        $clean = preg_replace('/\s+updated(\s+updated)*/i', '', $nama);
+        $clean = preg_replace('/\s+update(\s+update)*/i', '', $clean);
+        return trim($clean) ?: $nama;
     }
 
     public function getNikAttribute(): string
@@ -57,6 +68,22 @@ class RiwayatDonasi extends Model
     public function getAlamatAttribute(): string
     {
         return $this->pendonor?->alamat ?? '-';
+    }
+
+    public function getJenisKelaminAttribute(): string
+    {
+        return $this->pendonor?->jenis_kelamin ?? '-';
+    }
+
+    public function getTanggalLahirAttribute(): string
+    {
+        $tl = $this->pendonor?->tanggal_lahir;
+        return $tl ? (is_string($tl) ? $tl : $tl->format('Y-m-d')) : '-';
+    }
+
+    public function getPekerjaanAttribute(): string
+    {
+        return $this->pendonor?->pekerjaan ?? '-';
     }
 
     public function getLabelAttribute(): string

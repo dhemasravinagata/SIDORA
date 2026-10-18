@@ -28,7 +28,7 @@ Route::get('/dashboard', function () {
 })->middleware('auth')->name('dashboard');
 
 // Halaman index / publik
-Route::get('/', function (Request $request) {
+Route::match(['get', 'post'], '/', function (Request $request) {
     if ($request->has('page')) {
         return handleLegacyPage($request);
     }
@@ -101,6 +101,7 @@ Route::middleware(['auth', 'role:rumahsakit'])->prefix('rs')->name('rs.')->group
     Route::get('/permintaan', [RumahSakitController::class, 'permintaan'])->name('permintaan');
     Route::post('/permintaan', [RumahSakitController::class, 'permintaanStore'])->name('permintaan.store');
     Route::get('/history-permintaan', [RumahSakitController::class, 'historyPermintaan'])->name('history-permintaan');
+    Route::match(['get', 'post'], '/konfirmasi-terima', [RumahSakitController::class, 'konfirmasiTerima'])->name('konfirmasi-terima');
     Route::get('/stok-darah', [RumahSakitController::class, 'stokDarah'])->name('stok-darah');
     Route::get('/profil', [RumahSakitController::class, 'profil'])->name('profil');
     Route::post('/profil', [RumahSakitController::class, 'profilUpdate'])->name('profil.update');
@@ -110,9 +111,59 @@ Route::middleware(['auth', 'role:rumahsakit'])->prefix('rs')->name('rs.')->group
 // -------------------------------------------------------------
 // Dispatcher Kompatibilitas URL Lama: index.php?page=...
 // -------------------------------------------------------------
-Route::match(['get', 'post'], '/index.php', function (Request $request) {
+Route::match(['get', 'post'], '/index.php/{path?}', function (Request $request, ?string $path = null) {
+    $cleanPath = trim((string) $path, '/');
+    if ($cleanPath === 'login') {
+        if ($request->isMethod('POST')) {
+            return app(AuthController::class)->login($request);
+        }
+        return app(AuthController::class)->showLogin();
+    }
+    if ($cleanPath === 'register-rs') {
+        if ($request->isMethod('POST')) {
+            return app(AuthController::class)->registerRs($request);
+        }
+        return app(AuthController::class)->showRegisterRs();
+    }
+    if ($cleanPath === 'logout') {
+        return app(AuthController::class)->logout($request);
+    }
     return handleLegacyPage($request);
-});
+})->where('path', '.*');
+
+Route::match(['get', 'post'], '{prefix}/index.php/{path?}', function (Request $request, string $prefix, ?string $path = null) {
+    $cleanPath = trim((string) $path, '/');
+    if ($cleanPath === 'login') {
+        if ($request->isMethod('POST')) {
+            return app(AuthController::class)->login($request);
+        }
+        return app(AuthController::class)->showLogin();
+    }
+    if ($cleanPath === 'register-rs') {
+        if ($request->isMethod('POST')) {
+            return app(AuthController::class)->registerRs($request);
+        }
+        return app(AuthController::class)->showRegisterRs();
+    }
+    return handleLegacyPage($request);
+})->where('path', '.*');
+
+// Fallback aset agar tidak 404 saat diakses dari sub-path (/admin/assets/..., /index.php/..., dll)
+Route::get('assets/{path}', function (string $path) {
+    $fullPath = public_path('assets/' . $path);
+    if (file_exists($fullPath) && is_file($fullPath)) {
+        return response()->file($fullPath);
+    }
+    abort(404);
+})->where('path', '.*');
+
+Route::get('{prefix}/assets/{path}', function (string $prefix, string $path) {
+    $fullPath = public_path('assets/' . $path);
+    if (file_exists($fullPath) && is_file($fullPath)) {
+        return response()->file($fullPath);
+    }
+    abort(404);
+})->where('path', '.*');
 
 if (!function_exists('handleLegacyPage')) {
 function handleLegacyPage(Request $request)
@@ -213,6 +264,8 @@ function handleLegacyPage(Request $request)
         'rs-permintaan'         => 'permintaan',
         'rs-permintaan-store'   => 'permintaanStore',
         'rs-history-permintaan' => 'historyPermintaan',
+        'rs-konfirmasi-terima'  => 'konfirmasiTerima',
+        'rs-terima-permintaan'  => 'konfirmasiTerima',
         'rs-stok-darah'         => 'stokDarah',
         'rs-profil'             => 'profil',
         'rs-profil-update'      => 'profilUpdate',

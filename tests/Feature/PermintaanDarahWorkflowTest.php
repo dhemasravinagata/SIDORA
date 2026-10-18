@@ -212,4 +212,69 @@ class PermintaanDarahWorkflowTest extends TestCase
         $this->assertEquals('Dikirim', $permintaan->status);
         $this->assertEquals('Ambulans Reaksi Cepat PMI Lampung BE 1234 CD', $permintaan->kurir);
     }
+
+    public function test_hospital_can_confirm_received_blood_request(): void
+    {
+        $hospital = $this->getHospital();
+        $admin = $this->getAdmin();
+
+        $permintaan = PermintaanDarah::create([
+            'user_id'       => $hospital->id,
+            'status'        => 'Dikirim',
+            'prioritas'     => 'Darurat',
+            'keterangan'    => 'Darah sedang diantar kurir',
+            'kurir'         => 'Pak Slamet (Kurir PMI)',
+            'tanggal_kirim' => now()->toDateString(),
+        ]);
+        PermintaanDarahDetail::create([
+            'permintaan_id' => $permintaan->id,
+            'golongan'      => 'O',
+            'rhesus'        => '+',
+            'jumlah'        => 2,
+        ]);
+
+        $this->actingAs($hospital);
+        $response = $this->post('/rs/konfirmasi-terima', [
+            'permintaan_id'  => $permintaan->id,
+            'penerima'       => 'Ns. Ratna (Staf BDRS)',
+            'catatan_terima' => 'Diterima dalam cold-box suhu 4°C, kantong utuh.',
+        ]);
+
+        $response->assertRedirect(route('rs.history-permintaan'));
+        $response->assertSessionHas('success');
+
+        $permintaan->refresh();
+        $this->assertEquals('Diterima', $permintaan->status);
+        $this->assertEquals('Ns. Ratna (Staf BDRS)', $permintaan->penerima);
+        $this->assertEquals(now()->toDateString(), $permintaan->tanggal_terima->toDateString());
+        $this->assertTrue($permintaan->isDiterima());
+
+        // Verifikasi pada halaman Admin juga berubah menjadi Diterima
+        $this->actingAs($admin);
+        $adminResp = $this->get('/admin/permintaan-darah');
+        $adminResp->assertStatus(200);
+        $adminResp->assertSee('Diterima');
+    }
+
+    public function test_hospital_cannot_confirm_unshipped_request(): void
+    {
+        $hospital = $this->getHospital();
+
+        $permintaan = PermintaanDarah::create([
+            'user_id'    => $hospital->id,
+            'status'     => 'Pending',
+            'prioritas'  => 'Biasa',
+            'keterangan' => 'Belum dikirim',
+        ]);
+
+        $this->actingAs($hospital);
+        $response = $this->post('/rs/konfirmasi-terima', [
+            'permintaan_id' => $permintaan->id,
+            'penerima'      => 'Ns. Ratna',
+        ]);
+
+        $response->assertSessionHas('warning');
+        $permintaan->refresh();
+        $this->assertEquals('Pending', $permintaan->status);
+    }
 }

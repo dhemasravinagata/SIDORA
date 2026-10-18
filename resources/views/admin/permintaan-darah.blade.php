@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="{{ asset('/') }}">
     <title>Lihat Permintaan Darah - SIDORA Admin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -113,8 +114,9 @@
                         <option value="">Semua Status</option>
                         <option value="Ditinjau">Ditinjau</option>
                         <option value="disetujui">Disetujui</option>
-                        <option value="ditolak">Ditolak</option>
                         <option value="dikirim">Dikirim</option>
+                        <option value="diterima">Diterima</option>
+                        <option value="ditolak">Ditolak</option>
                     </select>
                 </div>
                 <div class="filter-group">
@@ -166,15 +168,15 @@
                                         $displayPrio = 'Biasa';
                                         $prio_class = 'priority-biasa';
                                     }
-                                    $stat_class = ($stat == 'disetujui') ? 'badge-disetujui' : (($stat == 'ditolak') ? 'badge-ditolak' : (($stat == 'dikirim') ? 'badge-dikirim' : 'badge-ditinjau'));
+                                    $stat_class = ($stat == 'disetujui') ? 'badge-disetujui' : (($stat == 'ditolak') ? 'badge-ditolak' : (($stat == 'dikirim') ? 'badge-dikirim' : (($stat == 'diterima') ? 'badge-diterima' : 'badge-ditinjau')));
                                 ?>
-                                <tr>
+                                <tr data-status="<?= htmlspecialchars($stat_display) ?>" data-prioritas="<?= htmlspecialchars(strtolower($displayPrio)) ?>">
                                     <td><?= $no++ ?></td>
                                     <td><?= htmlspecialchars($item['rumah_sakit'] ?? '-') ?></td>
                                     <td><?= htmlspecialchars(($item['golongan'] ?? '-') . ($item['rhesus'] ?? '')) ?></td>
                                     <td><?= htmlspecialchars($item['detail_jumlah'] ?? '1') ?> Kantong</td>
                                     <td><span class="priority-badge <?= $prio_class ?>"><?= $displayPrio ?></span></td>
-                                    <td><span class="badge <?= $stat_class ?>"><?php if($stat == 'disetujui'): ?><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg><?php elseif($stat == 'ditolak'): ?><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><?php elseif($stat == 'dikirim'): ?><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg><?php else: ?><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><?php endif; ?> <?= ucfirst($stat) ?></span></td>
+                                    <td><span class="badge <?= $stat_class ?>"><?php if($stat == 'disetujui'): ?><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg><?php elseif($stat == 'ditolak'): ?><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><?php elseif($stat == 'dikirim'): ?><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg><?php elseif($stat == 'diterima'): ?><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><?php else: ?><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><?php endif; ?> <?= ucfirst($stat_display) ?></span></td>
                                     <td><?= htmlspecialchars($item['tanggal'] ?? date('Y-m-d')) ?></td>
                                     <td>
                                         <div class="action-buttons action-buttons-fixed">
@@ -209,6 +211,7 @@
                 <button type="button" class="modal-close" onclick="closeModal('tolakModal')">&times;</button>
             </div>
             <form action="index.php?page=admin-tolak-permintaan" method="POST">
+                @csrf
                 <div class="modal-body">
                     <input type="hidden" name="permintaan_id" id="tolakId">
                     <div class="form-group">
@@ -231,6 +234,7 @@
                 <button class="modal-close" onclick="closeModal('kirimModal')">&times;</button>
             </div>
             <form action="index.php?page=admin-kirim-permintaan" method="POST">
+                @csrf
                 <input type="hidden" name="permintaan_id" id="kirimPermintaanId" value="">
                 <div class="modal-body">
                     <div class="form-group">
@@ -283,6 +287,7 @@
             let statusClass = 'badge-info';
             if (status.toLowerCase() === 'ditolak') statusClass = 'badge-danger';
             else if (status.toLowerCase() === 'dikirim') statusClass = 'badge-success';
+            else if (status.toLowerCase() === 'diterima') statusClass = 'badge-diterima';
             else if (status.toLowerCase() === 'ditinjau' || status.toLowerCase() === 'pending') statusClass = 'badge-warning';
 
             let html = `
@@ -331,12 +336,31 @@
             } else if (status.toLowerCase() === 'dikirim' || status.toLowerCase() === 'disetujui') {
                 html += `
                     <div class="detail-item">
-                        <p class="detail-label">Kurir</p>
+                        <p class="detail-label">Kurir Pengantar</p>
                         <p class="detail-value">${data.kurir || 'Belum diatur'}</p>
                     </div>
                     <div class="detail-item">
                         <p class="detail-label">Tanggal Kirim</p>
                         <p class="detail-value">${data.tanggal_kirim || 'Belum diatur'}</p>
+                    </div>
+                `;
+            } else if (status.toLowerCase() === 'diterima') {
+                html += `
+                    <div class="detail-item">
+                        <p class="detail-label">Kurir Pengantar</p>
+                        <p class="detail-value">${data.kurir || 'Belum diatur'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Tanggal Kirim</p>
+                        <p class="detail-value">${data.tanggal_kirim || 'Belum diatur'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Tanggal Diterima RS</p>
+                        <p class="detail-value">${data.tanggal_terima || 'Sudah diterima'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Penerima di RS</p>
+                        <p class="detail-value">${data.penerima || 'Pihak RS'}</p>
                     </div>
                 `;
             }
@@ -369,14 +393,16 @@
             const rows = tableBody.querySelectorAll('tr');
             
             function filterTable() {
-                const searchTerm = searchInput.value.toLowerCase().trim();
-                const statusFilter = statusSelect.value.toLowerCase();
-                const prioFilter = prioSelect.value.toLowerCase();
+                const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
+                const statusFilter = statusSelect ? statusSelect.value.toLowerCase().trim() : '';
+                const prioFilter = prioSelect ? prioSelect.value.toLowerCase().trim() : '';
                 
                 rows.forEach(row => {
                     if(row.cells.length <= 1) return; 
 
                     const text = row.textContent.toLowerCase();
+                    const rowStatus = (row.getAttribute('data-status') || '').toLowerCase().trim();
+                    const rowPrio = (row.getAttribute('data-prioritas') || '').toLowerCase().trim();
                     
                     const statusBadge = row.querySelector('.badge');
                     const prioBadge = row.querySelector('.priority-badge');
@@ -385,19 +411,28 @@
                     const prioText = prioBadge ? prioBadge.textContent.toLowerCase().trim() : '';
                     
                     const matchSearch = searchTerm === '' || text.includes(searchTerm);
-                    const matchStatus = statusFilter === '' || statusText === statusFilter;
-                    const matchPrio = prioFilter === '' || prioText === prioFilter;
+                    const matchStatus = statusFilter === '' || rowStatus === statusFilter || statusText.includes(statusFilter) || (statusFilter === 'ditinjau' && (rowStatus === 'pending' || rowStatus === 'ditinjau'));
+                    const matchPrio = prioFilter === '' || rowPrio === prioFilter || prioText === prioFilter;
                     
                     row.style.display = (matchSearch && matchStatus && matchPrio) ? '' : 'none';
                 });
             }
             
-            if(searchInput) searchInput.addEventListener('input', filterTable);
+            if(searchInput) {
+                searchInput.addEventListener('input', filterTable);
+                searchInput.addEventListener('keydown', function(e) {
+                    if(e.key === 'Enter') {
+                        e.preventDefault();
+                        filterTable();
+                    }
+                });
+            }
             if(statusSelect) statusSelect.addEventListener('change', filterTable);
             if(prioSelect) prioSelect.addEventListener('change', filterTable);
             
             if(resetBtn) {
-                resetBtn.addEventListener('click', function() {
+                resetBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
                     searchInput.value = '';
                     statusSelect.value = '';
                     prioSelect.value = '';

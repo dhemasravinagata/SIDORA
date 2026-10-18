@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="{{ asset('/') }}">
     <title>Riwayat Donasi - SIDORA Petugas</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -97,7 +98,7 @@
                 </div>
                 <div class="page-title">
                     <h1>Riwayat Donasi</h1>
-                    <a href="index.php?page=petugas-form-riwayat" class="btn btn-primary-sidora" style="text-decoration:none;"><i data-lucide="plus"></i> <span>Catat Donasi Baru</span></a>
+                    <a href="index.php?page=petugas-form-riwayat" class="btn btn-primary-sidora" style="text-decoration:none;"><i data-lucide="plus"></i> <span>Catat Donasi</span></a>
                 </div>
             </div>
 
@@ -189,6 +190,7 @@
     </div>
     
     <form id="hapusRiwayatForm" action="index.php?page=petugas-hapus-riwayat" method="POST" style="display: none;">
+        @csrf
         <input type="hidden" name="id" id="hapusRiwayatId">
     </form>
 
@@ -231,6 +233,34 @@
                         </div>
                         
                         <div class="detail-item full-width" style="background: transparent; border: none; padding: 0; margin-top: 10px;">
+                            <h4 style="margin: 0; color: var(--primary-color); border-bottom: 1px solid var(--border-soft); padding-bottom: 5px;">Data Pemeriksaan Medis</h4>
+                        </div>
+                        <div class="detail-item">
+                            <p class="detail-label">Tekanan Darah</p>
+                            <p class="detail-value"><strong>${data.tekanan_darah || '120/80'}</strong> mmHg</p>
+                        </div>
+                        <div class="detail-item">
+                            <p class="detail-label">Detak Jantung</p>
+                            <p class="detail-value">${data.detak_jantung || '72'} bpm</p>
+                        </div>
+                        <div class="detail-item">
+                            <p class="detail-label">Hemoglobin</p>
+                            <p class="detail-value">${data.hemoglobin || '14.5'} g/dL</p>
+                        </div>
+                        <div class="detail-item">
+                            <p class="detail-label">Suhu Tubuh</p>
+                            <p class="detail-value">${data.suhu_tubuh || '36.5'} °C</p>
+                        </div>
+                        <div class="detail-item">
+                            <p class="detail-label">Kesehatan Umum</p>
+                            <p class="detail-value"><span class="badge badge-success">${data.kesehatan_umum || 'Sehat Baik'}</span></p>
+                        </div>
+                        <div class="detail-item">
+                            <p class="detail-label">Catatan Medis</p>
+                            <p class="detail-value">${data.catatan || 'Kondisi fisik normal & sehat'}</p>
+                        </div>
+
+                        <div class="detail-item full-width" style="background: transparent; border: none; padding: 0; margin-top: 10px;">
                             <h4 style="margin: 0; color: var(--primary-color); border-bottom: 1px solid var(--border-soft); padding-bottom: 5px;">Detail Donasi</h4>
                         </div>
                         <div class="detail-item">
@@ -240,10 +270,6 @@
                         <div class="detail-item">
                             <p class="detail-label">Golongan Darah</p>
                             <p class="detail-value">${(data.golongan||'-') + (data.rhesus||'')}</p>
-                        </div>
-                        <div class="detail-item">
-                            <p class="detail-label">Tekanan Darah</p>
-                            <p class="detail-value">${data.tekanan_darah || '-'}</p>
                         </div>
                         <div class="detail-item">
                             <p class="detail-label">Jumlah</p>

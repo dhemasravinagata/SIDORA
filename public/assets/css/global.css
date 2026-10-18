@@ -673,9 +673,15 @@ table tbody tr:hover {
     color: #856404;
 }
 
-.badge-success, .badge-dikirim, .badge-aman, .badge-aktif {
+.badge-success, .badge-dikirim, .badge-diterima, .badge-aman, .badge-aktif {
     background-color: rgba(25,135,84,0.15);
     color: var(--color-success);
+}
+
+.badge-diterima {
+    background-color: rgba(16, 185, 129, 0.18);
+    color: #047857;
+    border: 1px solid rgba(16, 185, 129, 0.35);
 }
 
 .badge-danger, .badge-ditolak, .badge-kritis, .badge-darurat, .badge-tinggi {

@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="{{ asset('/') }}">
     <title>Form Riwayat Donasi - SIDORA Petugas</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -87,25 +88,42 @@
                 </div>
             </div>
 
+            <?php render_alerts(); ?>
+
             <form action="index.php?page=petugas-form-riwayat-process" method="POST" class="card">
+                @csrf
                 <h3 style="margin-top: 0;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> Informasi Pendonor</h3>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label>ID Pendonor *</label>
-                        <input type="number" name="pendonor_id" class="form-control" placeholder="ID Pendonor (misal: 1)" required>
-                        <small style="color: var(--gray);">Masukkan ID pendonor yang terdaftar</small>
+                        <label for="selectPendonor">Pilih Pendonor Terdaftar *</label>
+                        <select name="pendonor_id" id="selectPendonor" class="form-control" required onchange="handlePendonorChange(this)">
+                            <option value="">-- Pilih Pendonor --</option>
+                            <?php if (!empty($pendonorList)): foreach ($pendonorList as $p): ?>
+                                <option value="<?= $p->id ?>" 
+                                    data-golongan="<?= htmlspecialchars($p->golongan ?? '') ?>" 
+                                    data-rhesus="<?= htmlspecialchars($p->rhesus ?? '+') ?>"
+                                    data-tekanan="<?= htmlspecialchars($p->tekanan_darah ?? '120/80') ?>"
+                                    data-detak="<?= htmlspecialchars($p->detak_jantung ?? '72') ?>"
+                                    data-hb="<?= htmlspecialchars($p->hemoglobin ?? '14.5') ?>"
+                                    data-suhu="<?= htmlspecialchars($p->suhu_tubuh ?? '36.5') ?>"
+                                    data-kesehatan="<?= htmlspecialchars($p->kesehatan_umum ?? 'Sehat Baik') ?>">
+                                    #<?= $p->id ?> - <?= htmlspecialchars($p->nama) ?> (NIK: <?= htmlspecialchars($p->nik) ?>) [<?= htmlspecialchars($p->golongan . $p->rhesus) ?>]
+                                </option>
+                            <?php endforeach; endif; ?>
+                        </select>
+                        <small style="color: var(--gray);">Nomor ID Pendonor otomatis terisi dari data yang terdaftar</small>
                     </div>
                     <div class="form-group">
                         <label>Golongan Darah *</label>
-                        <input type="text" name="golongan" class="form-control" placeholder="Contoh: O" required>
+                        <input type="text" name="golongan" id="inputGolongan" class="form-control" placeholder="Contoh: O" required readonly style="background:#f8fafc;">
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label>Rhesus *</label>
-                        <select name="rhesus" class="form-control" required>
+                        <select name="rhesus" id="selectRhesus" class="form-control" required>
                             <option value="+">Positif (+)</option>
                             <option value="-">Negatif (-)</option>
                         </select>
@@ -123,36 +141,31 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Tekanan Darah (Sistol/Diastol)</label>
-                        <div style="display: flex; gap: var(--spacing-md); align-items: center;">
-                            <input type="number" class="form-control" placeholder="Sistol" value="120" style="flex: 1;">
-                            <span>/</span>
-                            <input type="number" class="form-control" placeholder="Diastol" value="80" style="flex: 1;">
-                        </div>
+                        <input type="text" name="tekanan_darah" id="inputTekanan" class="form-control" placeholder="Misal: 120/80" value="120/80">
                     </div>
                     <div class="form-group">
                         <label>Detak Jantung (bpm)</label>
-                        <input type="number" class="form-control" placeholder="Detak jantung per menit" value="72">
+                        <input type="text" name="detak_jantung" id="inputDetak" class="form-control" placeholder="Detak jantung per menit" value="72">
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label>Hemoglobin (g/dL)</label>
-                        <input type="number" class="form-control" placeholder="Kadar hemoglobin" value="14.5" step="0.1">
+                        <input type="text" name="hemoglobin" id="inputHb" class="form-control" placeholder="Kadar hemoglobin" value="14.5">
                     </div>
                     <div class="form-group">
                         <label>Suhu Tubuh (°C)</label>
-                        <input type="number" class="form-control" placeholder="Suhu tubuh" value="36.5" step="0.1">
+                        <input type="text" name="suhu_tubuh" id="inputSuhu" class="form-control" placeholder="Suhu tubuh" value="36.5">
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label>Kesehatan Umum</label>
-                    <select class="form-control">
-                        <option>-- Pilih Status Kesehatan --</option>
-                        <option selected>Sehat Baik</option>
-                        <option>Agak Sakit</option>
-                        <option>Sakit</option>
+                    <select name="kesehatan_umum" id="selectKesehatan" class="form-control">
+                        <option value="Sehat Baik" selected>Sehat Baik</option>
+                        <option value="Agak Sakit">Agak Sakit</option>
+                        <option value="Sakit">Sakit</option>
                     </select>
                 </div>
 
@@ -163,22 +176,20 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Jumlah (Kantong) *</label>
-                        <input type="number" name="jumlah" class="form-control" placeholder="Jumlah kantong (misal: 1)" value="1" required>
+                        <input type="number" name="jumlah" class="form-control" placeholder="Jumlah kantong (misal: 1)" value="1" required min="1" max="10">
                     </div>
                     <div class="form-group">
                         <label>Status Donasi *</label>
-                        <select class="form-control">
-                            <option>-- Pilih Status --</option>
-                            <option selected>Berhasil</option>
-                            <option>Ditolak</option>
-                            <option>Ditunda</option>
+                        <select name="status" class="form-control" required>
+                            <option value="Berhasil" selected>Berhasil</option>
+                            <option value="Ditolak">Ditolak</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label>Catatan / Keterangan</label>
-                    <textarea class="form-control" rows="4" placeholder="Catatan penting atau kondisi khusus pendonor..."></textarea>
+                    <textarea name="catatan" class="form-control" rows="3" placeholder="Catatan penting atau kondisi khusus pendonor..."></textarea>
                 </div>
 
                 <div style="background: #f0fdf4; border-left: 4px solid var(--success-color); padding: var(--spacing-lg); border-radius: var(--border-radius); margin-bottom: var(--spacing-lg);">
@@ -200,6 +211,28 @@
     </div>
     <script src="assets/js/sidebar.js"></script>
 
+    <script>
+        function handlePendonorChange(sel) {
+            const opt = sel.options[sel.selectedIndex];
+            if (!opt || !opt.value) return;
+
+            const gol = opt.getAttribute('data-golongan') || '';
+            const rh = opt.getAttribute('data-rhesus') || '+';
+            const td = opt.getAttribute('data-tekanan') || '120/80';
+            const dj = opt.getAttribute('data-detak') || '72';
+            const hb = opt.getAttribute('data-hb') || '14.5';
+            const st = opt.getAttribute('data-suhu') || '36.5';
+            const ku = opt.getAttribute('data-kesehatan') || 'Sehat Baik';
+
+            document.getElementById('inputGolongan').value = gol;
+            document.getElementById('selectRhesus').value = rh;
+            document.getElementById('inputTekanan').value = td;
+            document.getElementById('inputDetak').value = dj;
+            document.getElementById('inputHb').value = hb;
+            document.getElementById('inputSuhu').value = st;
+            document.getElementById('selectKesehatan').value = ku;
+        }
+    </script>
     <script src="assets/vendor/lucide/lucide.min.js"></script>
     <script>lucide.createIcons();</script>
 </body>

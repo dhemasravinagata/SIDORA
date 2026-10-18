@@ -73,7 +73,15 @@ class AuthenticationTest extends TestCase
         ]);
 
         $response->assertSessionHas('warning');
+        $this->assertStringContainsString('belum aktif', session('warning'));
+        $this->assertStringContainsString('verifikasi', session('warning'));
         $this->assertGuest();
+
+        // Follow redirect to login page and ensure alert banner is rendered
+        $loginPage = $this->get('/login');
+        $loginPage->assertStatus(200);
+        $loginPage->assertSee('Akun Menunggu Verifikasi');
+        $loginPage->assertSee('belum aktif karena masih dalam tahap verifikasi');
     }
 
     public function test_login_fails_with_invalid_password(): void
@@ -95,5 +103,55 @@ class AuthenticationTest extends TestCase
         $response = $this->post('/logout');
         $response->assertRedirect(route('login'));
         $this->assertGuest();
+    }
+
+    public function test_hospital_registration_validates_duplicate_email(): void
+    {
+        $response = $this->post('/register-rs', [
+            'nama_rs'  => 'RS Duplikat Test',
+            'email'    => 'admin@sidora.com', // Already taken
+            'password' => 'secret123',
+        ]);
+
+        $response->assertSessionHasErrors('email');
+        $this->assertStringContainsString('sudah terdaftar', session('error'));
+    }
+
+    public function test_hospital_registration_handles_whitespace_and_succeeds(): void
+    {
+        $uniqueEmail = 'rs_baru_' . time() . '@example.com';
+        $response = $this->post('/register-rs', [
+            'nama_rs'  => 'RS Sehat Sentosa',
+            'email'    => '  ' . strtoupper($uniqueEmail) . '  ',
+            'password' => 'password123',
+            'telepon'  => '081234567890',
+            'tipe_rs'  => 'Umum',
+            'no_izin'  => '123/RS/2026',
+        ]);
+
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHas('success');
+        $this->assertDatabaseHas('users', [
+            'email'  => strtolower($uniqueEmail),
+            'role'   => 'rumahsakit',
+            'status' => 'pending',
+        ]);
+    }
+
+    public function test_login_supports_case_insensitive_email(): void
+    {
+        $response = $this->post('/login', [
+            'email'    => 'ADMIN@SIDORA.COM',
+            'password' => 'password',
+        ]);
+
+        $response->assertRedirect(route('admin.dashboard'));
+        $this->assertAuthenticated();
+    }
+
+    public function test_legacy_slash_login_route_renders_cleanly(): void
+    {
+        $response = $this->get('/index.php/login');
+        $response->assertStatus(200);
     }
 }

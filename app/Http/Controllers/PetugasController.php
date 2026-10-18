@@ -52,7 +52,14 @@ class PetugasController extends Controller
         }
 
         if ($request->filled('golongan')) {
-            $query->where('golongan', $request->input('golongan'));
+            $gol = trim($request->input('golongan'));
+            if (in_array(strtoupper($gol), ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])) {
+                $base = substr($gol, 0, -1);
+                $rh = substr($gol, -1);
+                $query->where('golongan', $base)->where('rhesus', $rh);
+            } else {
+                $query->where('golongan', $gol);
+            }
         }
 
         if ($request->filled('status')) {
@@ -71,13 +78,37 @@ class PetugasController extends Controller
 
     public function tambahPendonorProcess(Request $request)
     {
+        if ($request->has('nik') && ! $request->has('no_identitas')) {
+            $request->merge(['no_identitas' => $request->input('nik')]);
+        }
+        if ($request->has('no_identitas') && ! $request->has('nik')) {
+            $request->merge(['nik' => $request->input('no_identitas')]);
+        }
+
+        if ($request->has('golongan_darah')) {
+            $rawGol = trim($request->input('golongan_darah'));
+            if (in_array(strtoupper($rawGol), ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])) {
+                $base = substr($rawGol, 0, -1);
+                $rh = substr($rawGol, -1);
+                $request->merge([
+                    'golongan_darah' => $base,
+                    'rhesus'         => $request->filled('rhesus') ? $request->input('rhesus') : $rh,
+                ]);
+            }
+        }
+
+        if ($request->has('email')) {
+            $rawEmail = trim((string) $request->input('email'));
+            $request->merge(['email' => $rawEmail !== '' ? strtolower($rawEmail) : null]);
+        }
+
         $validator = Validator::make($request->all(), [
             'nama'           => 'required|string|min:3|max:150',
             'no_identitas'   => 'required|string|min:8|max:30|unique:pendonor,nik',
-            'golongan_darah' => 'required|in:A,B,AB,O',
+            'golongan_darah' => 'required|in:A,B,AB,O,A+,A-,B+,B-,AB+,AB-,O+,O-,a,b,ab,o,a+,a-,b+,b-,ab+,ab-,o+,o-',
             'rhesus'         => 'required|in:+,-',
             'telepon'        => 'required|string|min:6|max:20',
-            'email'          => 'nullable|email|max:100',
+            'email'          => 'nullable|string|email:rfc,filter|max:100',
             'tanggal_lahir'  => 'nullable|date',
             'jenis_kelamin'  => 'nullable|string|max:20',
             'alamat'         => 'nullable|string|max:255',
@@ -85,13 +116,22 @@ class PetugasController extends Controller
             'provinsi'       => 'nullable|string|max:100',
             'pekerjaan'      => 'nullable|string|max:100',
             'status'         => 'nullable|string|in:aktif,nonaktif',
+            'tekanan_darah'  => 'nullable|string|max:20',
+            'detak_jantung'  => 'nullable|string|max:20',
+            'hemoglobin'     => 'nullable|string|max:20',
+            'suhu_tubuh'     => 'nullable|string|max:20',
+            'kesehatan_umum' => 'nullable|string|max:50',
+            'catatan'        => 'nullable|string',
+            'jumlah'         => 'nullable|integer|min:0',
+            'status_donasi'  => 'nullable|string|in:Berhasil,Ditolak',
         ], [
             'nama.required'           => 'Nama lengkap pendonor wajib diisi.',
             'no_identitas.required'   => 'Nomor identitas (NIK) wajib diisi.',
             'no_identitas.unique'     => 'NIK pendonor ini sudah terdaftar dalam sistem.',
-            'golongan_darah.required' => 'Golongan darah wajib dipilih (A, B, AB, O).',
+            'golongan_darah.required' => 'Golongan darah wajib dipilih (A, B, AB, O, atau A+, B+, dll).',
             'rhesus.required'         => 'Rhesus darah wajib dipilih (+ atau -).',
             'telepon.required'        => 'Nomor telepon wajib diisi.',
+            'email.email'             => 'Format email tidak valid (contoh: pendonor@gmail.com).',
         ]);
 
         if ($validator->fails()) {
@@ -100,36 +140,58 @@ class PetugasController extends Controller
 
         try {
             DB::transaction(function () use ($request) {
-                $statusDonasi = trim($request->input('status_donasi', 'Berhasil'));
+                $statusDonasi  = trim($request->input('status_donasi', 'Berhasil'));
+                $jumlahKantong = (int) $request->input('jumlah', 1);
+                if ($statusDonasi !== 'Berhasil') {
+                    $jumlahKantong = 0;
+                }
+
+                $tekananDarah = trim($request->input('tekanan_darah')) ?: '120/80';
+                $detakJantung = trim($request->input('detak_jantung')) ?: '72';
+                $hemoglobin   = trim($request->input('hemoglobin')) ?: '14.5';
+                $suhuTubuh    = trim($request->input('suhu_tubuh')) ?: '36.5';
+                $kesehatan    = trim($request->input('kesehatan_umum')) ?: 'Sehat Baik';
+                $catatan      = trim($request->input('catatan')) ?: null;
 
                 $pendonor = Pendonor::create([
-                    'nama'          => trim($request->input('nama')),
-                    'nik'           => trim($request->input('no_identitas')),
-                    'golongan'      => trim($request->input('golongan_darah')),
-                    'rhesus'        => trim($request->input('rhesus')),
-                    'telepon'       => trim($request->input('telepon')),
-                    'email'         => trim($request->input('email')) ?: null,
-                    'tanggal_lahir' => $request->input('tanggal_lahir') ?: null,
-                    'jenis_kelamin' => trim($request->input('jenis_kelamin')) ?: null,
-                    'alamat'        => trim($request->input('alamat')) ?: null,
-                    'kota'          => trim($request->input('kota')) ?: null,
-                    'provinsi'      => trim($request->input('provinsi')) ?: null,
-                    'pekerjaan'     => trim($request->input('pekerjaan')) ?: null,
-                    'status'        => $request->input('status') === 'aktif' ? 'aktif' : 'nonaktif',
-                    'tgl_donor'     => $statusDonasi === 'Berhasil' ? now()->toDateString() : null,
+                    'nama'           => trim($request->input('nama')),
+                    'nik'            => trim($request->input('no_identitas')),
+                    'golongan'       => trim($request->input('golongan_darah')),
+                    'rhesus'         => trim($request->input('rhesus')),
+                    'telepon'        => trim($request->input('telepon')),
+                    'email'          => trim($request->input('email')) ?: null,
+                    'tanggal_lahir'  => $request->input('tanggal_lahir') ?: null,
+                    'jenis_kelamin'  => trim($request->input('jenis_kelamin')) ?: null,
+                    'alamat'         => trim($request->input('alamat')) ?: null,
+                    'kota'           => trim($request->input('kota')) ?: null,
+                    'provinsi'       => trim($request->input('provinsi')) ?: null,
+                    'pekerjaan'      => trim($request->input('pekerjaan')) ?: null,
+                    'status'         => $request->input('status') === 'nonaktif' ? 'nonaktif' : 'aktif',
+                    'tgl_donor'      => $statusDonasi === 'Berhasil' ? now()->toDateString() : null,
+                    'tekanan_darah'  => $tekananDarah,
+                    'detak_jantung'  => $detakJantung,
+                    'hemoglobin'     => $hemoglobin,
+                    'suhu_tubuh'     => $suhuTubuh,
+                    'kesehatan_umum' => $kesehatan,
+                    'catatan'        => $catatan,
                 ]);
 
                 RiwayatDonasi::create([
-                    'pendonor_id'   => $pendonor->id,
-                    'golongan'      => $pendonor->golongan,
-                    'rhesus'        => $pendonor->rhesus,
-                    'jumlah'        => $statusDonasi === 'Berhasil' ? 1 : 0,
-                    'tanggal'       => now()->toDateString(),
-                    'tekanan_darah' => trim($request->input('tekanan_darah', '120/80')),
-                    'status'        => $statusDonasi,
+                    'pendonor_id'    => $pendonor->id,
+                    'golongan'       => $pendonor->golongan,
+                    'rhesus'         => $pendonor->rhesus,
+                    'jumlah'         => $jumlahKantong,
+                    'tanggal'        => now()->toDateString(),
+                    'tekanan_darah'  => $tekananDarah,
+                    'detak_jantung'  => $detakJantung,
+                    'hemoglobin'     => $hemoglobin,
+                    'suhu_tubuh'     => $suhuTubuh,
+                    'kesehatan_umum' => $kesehatan,
+                    'catatan'        => $catatan,
+                    'status'         => $statusDonasi,
                 ]);
 
-                if ($statusDonasi === 'Berhasil') {
+                if ($statusDonasi === 'Berhasil' && $jumlahKantong > 0) {
                     $stok = StokDarah::where('golongan_darah', $pendonor->golongan)
                         ->where('rhesus', $pendonor->rhesus)
                         ->lockForUpdate()
@@ -144,20 +206,19 @@ class PetugasController extends Controller
                         ]);
                     }
 
-                    $sebelum = $stok->jumlah;
-                    $stok->jumlah += 1;
+                    $stok->jumlah += $jumlahKantong;
                     $stok->save();
 
                     StokDarahHistory::create([
                         'golongan'   => $pendonor->golongan,
                         'rhesus'     => $pendonor->rhesus,
-                        'masuk'      => 1,
+                        'masuk'      => $jumlahKantong,
                         'keluar'     => 0,
                         'stok_akhir' => $stok->jumlah,
                         'catatan'    => "Penambahan stok dari donor baru: {$pendonor->nama}",
                     ]);
 
-                    Log::info("Petugas mencatat penambahan stok darah {$pendonor->golongan}{$pendonor->rhesus} (+1 kantong) dari pendonor {$pendonor->nama}");
+                    Log::info("Petugas mencatat penambahan stok darah {$pendonor->golongan}{$pendonor->rhesus} (+{$jumlahKantong} kantong) dari pendonor {$pendonor->nama}");
                 }
 
                 Log::info("Petugas mendaftarkan pendonor baru: {$pendonor->nama} (NIK: {$pendonor->nik})");
@@ -176,18 +237,43 @@ class PetugasController extends Controller
         $id = $id ?: $request->input('id');
         $pendonor = Pendonor::findOrFail($id);
 
+        if ($request->has('nik') && ! $request->has('no_identitas')) {
+            $request->merge(['no_identitas' => $request->input('nik')]);
+        }
+        if ($request->has('no_identitas') && ! $request->has('nik')) {
+            $request->merge(['nik' => $request->input('no_identitas')]);
+        }
+
+        if ($request->has('golongan_darah')) {
+            $rawGol = trim($request->input('golongan_darah'));
+            if (in_array(strtoupper($rawGol), ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])) {
+                $base = substr($rawGol, 0, -1);
+                $rh = substr($rawGol, -1);
+                $request->merge([
+                    'golongan_darah' => $base,
+                    'rhesus'         => $request->filled('rhesus') ? $request->input('rhesus') : $rh,
+                ]);
+            }
+        }
+
+        if ($request->has('email')) {
+            $rawEmail = trim((string) $request->input('email'));
+            $request->merge(['email' => $rawEmail !== '' ? strtolower($rawEmail) : null]);
+        }
+
         $validator = Validator::make($request->all(), [
             'nama'           => 'required|string|min:3|max:150',
             'nik'            => "required|string|min:8|max:30|unique:pendonor,nik,{$pendonor->id}",
-            'golongan_darah' => 'required|in:A,B,AB,O',
+            'golongan_darah' => 'required|in:A,B,AB,O,A+,A-,B+,B-,AB+,AB-,O+,O-,a,b,ab,o,a+,a-,b+,b-,ab+,ab-,o+,o-',
             'rhesus'         => 'required|in:+,-',
             'telepon'        => 'required|string|min:6|max:20',
-            'email'          => 'nullable|email|max:100',
+            'email'          => 'nullable|string|email:rfc,filter|max:100',
             'tanggal_lahir'  => 'nullable|date',
         ], [
             'nama.required' => 'Nama lengkap pendonor wajib diisi.',
             'nik.required'  => 'NIK pendonor wajib diisi.',
             'nik.unique'    => 'NIK ini sudah digunakan pendonor lain.',
+            'email.email'   => 'Format email tidak valid (contoh: pendonor@gmail.com).',
         ]);
 
         if ($validator->fails()) {
@@ -195,19 +281,25 @@ class PetugasController extends Controller
         }
 
         $pendonor->update([
-            'nama'          => trim($request->input('nama')),
-            'nik'           => trim($request->input('nik')),
-            'golongan'      => trim($request->input('golongan_darah')),
-            'rhesus'        => trim($request->input('rhesus')),
-            'telepon'       => trim($request->input('telepon')),
-            'email'         => trim($request->input('email')) ?: null,
-            'tanggal_lahir' => $request->input('tanggal_lahir') ?: null,
-            'jenis_kelamin' => trim($request->input('jenis_kelamin')) ?: null,
-            'alamat'        => trim($request->input('alamat')) ?: null,
-            'kota'          => trim($request->input('kota')) ?: null,
-            'provinsi'      => trim($request->input('provinsi')) ?: null,
-            'pekerjaan'     => trim($request->input('pekerjaan')) ?: null,
-            'status'        => $request->input('status') === 'aktif' ? 'aktif' : 'nonaktif',
+            'nama'           => trim($request->input('nama')),
+            'nik'            => trim($request->input('nik')),
+            'golongan'       => trim($request->input('golongan_darah')),
+            'rhesus'         => trim($request->input('rhesus')),
+            'telepon'        => trim($request->input('telepon')),
+            'email'          => trim($request->input('email')) ?: null,
+            'tanggal_lahir'  => $request->input('tanggal_lahir') ?: null,
+            'jenis_kelamin'  => trim($request->input('jenis_kelamin')) ?: null,
+            'alamat'         => trim($request->input('alamat')) ?: null,
+            'kota'           => trim($request->input('kota')) ?: null,
+            'provinsi'       => trim($request->input('provinsi')) ?: null,
+            'pekerjaan'      => trim($request->input('pekerjaan')) ?: null,
+            'status'         => $request->input('status') === 'aktif' ? 'aktif' : 'nonaktif',
+            'tekanan_darah'  => $request->filled('tekanan_darah') ? trim($request->input('tekanan_darah')) : $pendonor->tekanan_darah,
+            'detak_jantung'  => $request->filled('detak_jantung') ? trim($request->input('detak_jantung')) : $pendonor->detak_jantung,
+            'hemoglobin'     => $request->filled('hemoglobin') ? trim($request->input('hemoglobin')) : $pendonor->hemoglobin,
+            'suhu_tubuh'     => $request->filled('suhu_tubuh') ? trim($request->input('suhu_tubuh')) : $pendonor->suhu_tubuh,
+            'kesehatan_umum' => $request->filled('kesehatan_umum') ? trim($request->input('kesehatan_umum')) : $pendonor->kesehatan_umum,
+            'catatan'        => $request->filled('catatan') ? trim($request->input('catatan')) : $pendonor->catatan,
         ]);
 
         Log::info("Petugas memperbarui data pendonor ID #{$pendonor->id} ({$pendonor->nama})");
@@ -278,13 +370,18 @@ class PetugasController extends Controller
                 $jumlah   = (int) $request->input('jumlah');
 
                 $riwayat = RiwayatDonasi::create([
-                    'pendonor_id'   => $request->input('pendonor_id'),
-                    'golongan'      => $golongan,
-                    'rhesus'        => $rhesus,
-                    'jumlah'        => $status === 'Berhasil' ? $jumlah : 0,
-                    'tanggal'       => $request->input('tanggal'),
-                    'tekanan_darah' => trim($request->input('tekanan_darah', '120/80')),
-                    'status'        => $status,
+                    'pendonor_id'    => $request->input('pendonor_id'),
+                    'golongan'       => $golongan,
+                    'rhesus'         => $rhesus,
+                    'jumlah'         => $status === 'Berhasil' ? $jumlah : 0,
+                    'tanggal'        => $request->input('tanggal'),
+                    'tekanan_darah'  => trim($request->input('tekanan_darah')) ?: '120/80',
+                    'detak_jantung'  => trim($request->input('detak_jantung')) ?: '72',
+                    'hemoglobin'     => trim($request->input('hemoglobin')) ?: '14.5',
+                    'suhu_tubuh'     => trim($request->input('suhu_tubuh')) ?: '36.5',
+                    'kesehatan_umum' => trim($request->input('kesehatan_umum')) ?: 'Sehat Baik',
+                    'catatan'        => trim($request->input('catatan')) ?: null,
+                    'status'         => $status,
                 ]);
 
                 if ($status === 'Berhasil') {

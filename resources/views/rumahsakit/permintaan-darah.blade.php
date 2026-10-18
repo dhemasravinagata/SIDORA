@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="{{ asset('/') }}">
     <title>Ajukan Permintaan Darah - SIDORA</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -277,16 +278,19 @@
 Permintaan darah Anda akan diproses maksimal 24 jam. Silakan hubungi kami jika ada pertanyaan.
             </div>
 
-            <form id="permintaanForm" action="index.php?page=rs-permintaan-store" method="POST" class="card">
-                    <h3 style="margin-top: 0;"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;margin-right:8px;"><circle cx="12" cy="12" r="10"/><polyline points="12 16 16 12 12 8"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Tujuan Permintaan</h3>
+            <form id="permintaanForm" action="{{ request()->has('page') ? 'index.php?page=rs-permintaan-store' : route('rs.permintaan.store') }}" method="POST" class="card">
+                @csrf
+                <input type="hidden" name="page" value="rs-permintaan-store">
+
+                <h3 style="margin-top: 0;"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;margin-right:8px;"><circle cx="12" cy="12" r="10"/><polyline points="12 16 16 12 12 8"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Tujuan Permintaan</h3>
                     <div class="form-group" style="margin-bottom: var(--spacing-lg);">
                         <div style="display: flex; gap: var(--spacing-lg);">
                             <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                <input type="radio" name="tujuan_permintaan" value="pasien" checked onchange="toggleTujuan()">
+                                <input type="radio" name="tujuan_permintaan" value="pasien" <?= old('tujuan_permintaan', 'pasien') === 'pasien' ? 'checked' : '' ?> onchange="toggleTujuan()">
                                 <span>Khusus Pasien (Cito/Crossmatching)</span>
                             </label>
                             <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                <input type="radio" name="tujuan_permintaan" value="stok" onchange="toggleTujuan()">
+                                <input type="radio" name="tujuan_permintaan" value="stok" <?= old('tujuan_permintaan') === 'stok' ? 'checked' : '' ?> onchange="toggleTujuan()">
                                 <span>Penambahan Stok BDRS (Dropping)</span>
                             </label>
                         </div>
@@ -295,27 +299,39 @@ Permintaan darah Anda akan diproses maksimal 24 jam. Silakan hubungi kami jika a
                     <div id="informasiPasienSection">
                         <hr style="margin: var(--spacing-2xl) 0; border: none; border-top: 1px solid var(--border-color);">
                         <h3><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;margin-right:8px;"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>Informasi Pasien</h3>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="namaPasien" class="required">Nama Pasien</label>
-                            <input type="text" id="namaPasien" name="nama_pasien" class="form-control" required>
-                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="namaPasien" class="required">Nama Pasien</label>
+                                <input type="text" id="namaPasien" name="nama_pasien" value="<?= htmlspecialchars((string) old('nama_pasien')) ?>" class="form-control" placeholder="Nama lengkap pasien" required>
+                                <?php if (has_error('nama_pasien')): ?>
+                                    <span class="error" style="color:#DC2626;font-size:0.8rem;display:block;margin-top:4px;font-weight:500;"><?= htmlspecialchars(error('nama_pasien')) ?></span>
+                                <?php endif; ?>
+                            </div>
 
-                        <div class="form-group">
-                            <label for="noPasien" class="required">No. Pasien/Rekam Medis</label>
-                            <input type="text" id="noPasien" name="no_pasien" class="form-control" required>
+                            <div class="form-group">
+                                <label for="noPasien" class="required">No. Pasien/Rekam Medis</label>
+                                <input type="text" id="noPasien" name="no_pasien" value="<?= htmlspecialchars((string) old('no_pasien')) ?>" class="form-control" placeholder="Contoh: RM-102934" required>
+                                <?php if (has_error('no_pasien')): ?>
+                                    <span class="error" style="color:#DC2626;font-size:0.8rem;display:block;margin-top:4px;font-weight:500;"><?= htmlspecialchars(error('no_pasien')) ?></span>
+                                <?php endif; ?>
+                            </div>
                         </div>
-                    </div>
 
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="ruangan" class="required">Ruangan/Dept.</label>
-                                <input type="text" id="ruangan" name="ruangan" class="form-control" required>
+                                <input type="text" id="ruangan" name="ruangan" value="<?= htmlspecialchars((string) old('ruangan')) ?>" class="form-control" placeholder="Contoh: ICU, Ruang Melati, IGD" required>
+                                <?php if (has_error('ruangan')): ?>
+                                    <span class="error" style="color:#DC2626;font-size:0.8rem;display:block;margin-top:4px;font-weight:500;"><?= htmlspecialchars(error('ruangan')) ?></span>
+                                <?php endif; ?>
                             </div>
 
                             <div class="form-group">
                                 <label for="dokter" class="required">Dokter Penanggungjawab</label>
-                                <input type="text" id="dokter" name="dokter" class="form-control" required>
+                                <input type="text" id="dokter" name="dokter" value="<?= htmlspecialchars((string) old('dokter')) ?>" class="form-control" placeholder="Contoh: dr. Budi Santoso, Sp.PK" required>
+                                <?php if (has_error('dokter')): ?>
+                                    <span class="error" style="color:#DC2626;font-size:0.8rem;display:block;margin-top:4px;font-weight:500;"><?= htmlspecialchars(error('dokter')) ?></span>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -336,31 +352,39 @@ Permintaan darah Anda akan diproses maksimal 24 jam. Silakan hubungi kami jika a
                         <button type="button" class="blood-type-btn" data-gol="AB" data-rh="-" onclick="selectBloodType(this, 'AB', '-')">AB-</button>
                     </div>
 
-                    <input type="hidden" id="selectedGolongan" name="golongan" required>
-                    <input type="hidden" id="selectedRhesus" name="rhesus" required>
+                    <input type="hidden" id="selectedGolongan" name="golongan" value="<?= htmlspecialchars((string) old('golongan')) ?>" required>
+                    <input type="hidden" id="selectedRhesus" name="rhesus" value="<?= htmlspecialchars((string) old('rhesus')) ?>" required>
+                    <?php if (has_error('golongan') || has_error('rhesus')): ?>
+                        <span class="error" style="color:#DC2626;font-size:0.8rem;display:block;margin-top:-10px;margin-bottom:15px;font-weight:500;">
+                            <?= htmlspecialchars(error('golongan') ?: error('rhesus')) ?>
+                        </span>
+                    <?php endif; ?>
 
                     <div class="form-group">
                         <label for="jumlah" class="required">Jumlah Kantong Darah</label>
                         <div class="quantity-input">
                             <button type="button" class="quantity-btn" onclick="decreaseQuantity()">-</button>
-                            <input type="number" id="jumlah" name="jumlah" value="1" min="1" max="100" class="form-control" style="width: 80px;" oninput="updateSummaryQty(this.value)" onchange="this.value = Math.max(1, Math.min(100, parseInt(this.value) || 1)); updateSummaryQty(this.value);">
+                            <input type="number" id="jumlah" name="jumlah" value="<?= htmlspecialchars((string) old('jumlah', 1)) ?>" min="1" max="100" class="form-control" style="width: 80px;" oninput="updateSummaryQty(this.value)" onchange="this.value = Math.max(1, Math.min(100, parseInt(this.value) || 1)); updateSummaryQty(this.value);">
                             <button type="button" class="quantity-btn" onclick="increaseQuantity()">+</button>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label for="keterangan">Keterangan/Catatan Khusus</label>
-                        <textarea id="keterangan" name="keterangan" class="form-control" rows="3" placeholder="Misalnya: untuk operasi darurat, kondisi pasien kritis, dll"></textarea>
+                        <textarea id="keterangan" name="keterangan" class="form-control" rows="3" placeholder="Misalnya: untuk operasi darurat, kondisi pasien kritis, dll"><?= htmlspecialchars((string) old('keterangan')) ?></textarea>
                     </div>
 
                     <div class="form-group">
                         <label for="prioritas" class="required">Prioritas</label>
                         <select id="prioritas" name="prioritas" class="form-control" required>
                             <option value="">-- Pilih Prioritas --</option>
-                            <option value="biasa">Biasa (Standar)</option>
-                            <option value="segera">Segera (Urgent)</option>
-                            <option value="darurat">Darurat (Emergency)</option>
+                            <option value="Biasa" <?= in_array(old('prioritas'), ['Biasa', 'biasa']) ? 'selected' : '' ?>>Biasa (Standar)</option>
+                            <option value="Segera" <?= in_array(old('prioritas'), ['Segera', 'segera', 'Penting', 'penting']) ? 'selected' : '' ?>>Segera (Urgent)</option>
+                            <option value="Darurat" <?= in_array(old('prioritas'), ['Darurat', 'darurat']) ? 'selected' : '' ?>>Darurat (Emergency)</option>
                         </select>
+                        <?php if (has_error('prioritas')): ?>
+                            <span class="error" style="color:#DC2626;font-size:0.8rem;display:block;margin-top:4px;font-weight:500;"><?= htmlspecialchars(error('prioritas')) ?></span>
+                        <?php endif; ?>
                     </div>
 
                     <div style="background: #e0f2fe; border-left: 4px solid var(--primary-color); padding: var(--spacing-lg); border-radius: var(--border-radius); margin: var(--spacing-xl) 0;">
@@ -371,7 +395,7 @@ Permintaan darah Anda akan diproses maksimal 24 jam. Silakan hubungi kami jika a
                         </div>
                         <div class="summary-item">
                             <span>Jumlah Kantong:</span>
-                            <strong id="summaryQty">1 Kantong</strong>
+                            <strong id="summaryQty"><?= (int)old('jumlah', 1) ?> Kantong</strong>
                         </div>
                         <div class="summary-item" style="border-bottom: none;">
                             <span>Prioritas:</span>
@@ -398,15 +422,17 @@ Permintaan darah Anda akan diproses maksimal 24 jam. Silakan hubungi kami jika a
         }
 
         function toggleTujuan() {
-            const isStok = document.querySelector('input[name="tujuan_permintaan"]:checked').value === 'stok';
+            const checkedRadio = document.querySelector('input[name="tujuan_permintaan"]:checked');
+            if (!checkedRadio) return;
+            const isStok = checkedRadio.value === 'stok';
             const pasienSection = document.getElementById('informasiPasienSection');
+            if (!pasienSection) return;
             const inputs = pasienSection.querySelectorAll('input');
             
             if (isStok) {
                 pasienSection.style.display = 'none';
                 inputs.forEach(input => {
                     input.required = false;
-                    input.value = ''; 
                 });
             } else {
                 pasienSection.style.display = 'block';
@@ -416,7 +442,7 @@ Permintaan darah Anda akan diproses maksimal 24 jam. Silakan hubungi kami jika a
 
         function decreaseQuantity() {
             const input = document.getElementById('jumlah');
-            let val = parseInt(input.value);
+            let val = parseInt(input.value) || 1;
             if (val > 1) {
                 input.value = val - 1;
                 updateSummaryQty(val - 1);
@@ -425,7 +451,7 @@ Permintaan darah Anda akan diproses maksimal 24 jam. Silakan hubungi kami jika a
 
         function increaseQuantity() {
             const input = document.getElementById('jumlah');
-            let val = parseInt(input.value);
+            let val = parseInt(input.value) || 1;
             if (val < 100) {
                 input.value = val + 1;
                 updateSummaryQty(val + 1);
@@ -437,16 +463,39 @@ Permintaan darah Anda akan diproses maksimal 24 jam. Silakan hubungi kami jika a
         }
 
         document.getElementById('prioritas').addEventListener('change', function() {
-            document.getElementById('summaryPriority').textContent = this.options[this.selectedIndex].text;
+            document.getElementById('summaryPriority').textContent = this.selectedIndex > 0 ? this.options[this.selectedIndex].text : '-';
         });
 
         document.getElementById('permintaanForm').addEventListener('reset', function() {
             setTimeout(() => {
                 document.querySelectorAll('.blood-type-btn').forEach(b => b.classList.remove('selected'));
+                document.getElementById('selectedGolongan').value = '';
+                document.getElementById('selectedRhesus').value = '';
                 document.getElementById('summaryBlood').textContent = '-';
                 document.getElementById('summaryQty').textContent = '1 Kantong';
                 document.getElementById('summaryPriority').textContent = '-';
+                toggleTujuan();
             }, 10);
+        });
+
+        // Inisialisasi awal saat halaman dimuat (termasuk mengembalikan state old input)
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleTujuan();
+            
+            const oldGol = document.getElementById('selectedGolongan').value;
+            const oldRh  = document.getElementById('selectedRhesus').value;
+            if (oldGol && oldRh) {
+                const btn = document.querySelector(`.blood-type-btn[data-gol="${oldGol}"][data-rh="${oldRh}"]`);
+                if (btn) {
+                    btn.classList.add('selected');
+                    document.getElementById('summaryBlood').textContent = oldGol + oldRh;
+                }
+            }
+
+            const prioSelect = document.getElementById('prioritas');
+            if (prioSelect && prioSelect.selectedIndex > 0) {
+                document.getElementById('summaryPriority').textContent = prioSelect.options[prioSelect.selectedIndex].text;
+            }
         });
     </script>
     <script src="assets/js/sidebar.js"></script>

@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="{{ asset('/') }}">
     <title>Tambah Petugas - SIDORA Admin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -93,30 +94,43 @@
                 </div>
             </div>
 
+            <?php render_alerts(); ?>
+
             <form action="index.php?page=admin-tambah-petugas" method="POST" class="card">
+                @csrf
                 <h3 style="margin-top: 0;"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;margin-right:8px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Kredensial Akun</h3>
                 
                 <div class="form-row">
                     <div class="form-group">
                         <label for="usernamePetugas" class="required">Username</label>
-                        <input type="text" id="usernamePetugas" name="username" class="form-control" required>
+                        <input type="text" id="usernamePetugas" name="username" value="<?= htmlspecialchars(old('username')) ?>" class="form-control" placeholder="Contoh: petugas_ani" required>
+                        <?php if (has_error('username')): ?>
+                            <span class="error" style="color:#DC2626;font-size:0.8rem;display:block;margin-top:4px;font-weight:500;"><?= htmlspecialchars(error('username')) ?></span>
+                        <?php endif; ?>
                     </div>
                     <div class="form-group">
                         <label for="passwordPetugas" class="required">Password</label>
-                        <input type="password" id="passwordPetugas" name="password" class="form-control" required>
+                        <input type="password" id="passwordPetugas" name="password" class="form-control" placeholder="Minimal 6 karakter" required>
+                        <?php if (has_error('password')): ?>
+                            <span class="error" style="color:#DC2626;font-size:0.8rem;display:block;margin-top:4px;font-weight:500;"><?= htmlspecialchars(error('password')) ?></span>
+                        <?php endif; ?>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label for="emailPetugas" class="required">Email</label>
-                        <input type="email" id="emailPetugas" name="email" class="form-control" required>
+                        <input type="email" id="emailPetugas" name="email" value="<?= htmlspecialchars(old('email')) ?>" class="form-control" placeholder="Contoh: petugas@sidora.com" required>
+                        <?php if (has_error('email')): ?>
+                            <span class="error" style="color:#DC2626;font-size:0.8rem;display:block;margin-top:4px;font-weight:500;"><?= htmlspecialchars(error('email')) ?></span>
+                        <?php endif; ?>
+                        <small style="color: #64748B; font-size: 0.78rem; display: block; margin-top: 4px;">Email harus unik dan belum digunakan akun lain.</small>
                     </div>
                     <div class="form-group">
                         <label for="statusPetugas" class="required">Status Akun</label>
                         <select id="statusPetugas" name="status" class="form-control" required>
-                            <option value="aktif">Aktif</option>
-                            <option value="nonaktif">Non-aktif</option>
+                            <option value="aktif" <?= old('status', 'aktif') === 'aktif' ? 'selected' : '' ?>>Aktif</option>
+                            <option value="nonaktif" <?= old('status') === 'nonaktif' ? 'selected' : '' ?>>Non-aktif</option>
                         </select>
                     </div>
                 </div>
@@ -128,11 +142,17 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="namaPetugas" class="required">Nama Lengkap</label>
-                        <input type="text" id="namaPetugas" name="nama" class="form-control" required>
+                        <input type="text" id="namaPetugas" name="nama" value="<?= htmlspecialchars(old('nama')) ?>" class="form-control" placeholder="Nama lengkap petugas" required>
+                        <?php if (has_error('nama')): ?>
+                            <span class="error" style="color:#DC2626;font-size:0.8rem;display:block;margin-top:4px;font-weight:500;"><?= htmlspecialchars(error('nama')) ?></span>
+                        <?php endif; ?>
                     </div>
                     <div class="form-group">
                         <label for="nomorPetugas" class="required">No. Telepon</label>
-                        <input type="tel" id="nomorPetugas" name="telepon" class="form-control" required>
+                        <input type="tel" id="nomorPetugas" name="telepon" value="<?= htmlspecialchars(old('telepon')) ?>" class="form-control" placeholder="Contoh: 081234567890" required>
+                        <?php if (has_error('telepon')): ?>
+                            <span class="error" style="color:#DC2626;font-size:0.8rem;display:block;margin-top:4px;font-weight:500;"><?= htmlspecialchars(error('telepon')) ?></span>
+                        <?php endif; ?>
                     </div>
                 </div>
 

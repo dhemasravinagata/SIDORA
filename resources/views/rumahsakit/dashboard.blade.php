@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="{{ asset('/') }}">
     <title>Dashboard Rumah Sakit - SIDORA</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -220,6 +221,7 @@ Tidak Tersedia
                                     $status = $item['status'] ?? 'Pending';
                                     $statusClass = 'badge-warning';
                                     if ($status == 'Disetujui' || $status == 'Dikirim') $statusClass = 'badge-success';
+                                    elseif ($status == 'Diterima') $statusClass = 'badge-diterima';
                                     elseif ($status == 'Ditolak') $statusClass = 'badge-danger';
                                     
                                     $detailPermintaan = [
@@ -235,6 +237,8 @@ Tidak Tersedia
                                         'tanggal_tolak' => $item['tanggal_tolak'] ?? '-',
                                         'kurir' => $item['kurir'] ?? '-',
                                         'tanggal_kirim' => $item['tanggal_kirim'] ?? '-',
+                                        'tanggal_terima' => $item['tanggal_terima'] ?? '-',
+                                        'penerima' => $item['penerima'] ?? '-',
                                     ];
                                 ?>
                                 <tr>
@@ -250,6 +254,8 @@ Tidak Tersedia
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                                             <?php elseif ($status === 'Dikirim'): ?>
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                                            <?php elseif ($status === 'Diterima'): ?>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                                             <?php else: ?>
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                                             <?php endif; ?>
@@ -257,9 +263,16 @@ Tidak Tersedia
                                         </span>
                                     </td>
                                     <td>
-                                        <button type="button" class="btn btn-outline-sidora btn-small" onclick='openDetailPermintaanModal(<?= htmlspecialchars(json_encode($detailPermintaan), ENT_QUOTES, "UTF-8") ?>)'>
-                                            <i data-lucide="eye"></i> <span>Detail</span>
-                                        </button>
+                                        <div class="action-buttons">
+                                            <?php if ($status === 'Dikirim'): ?>
+                                                <a href="index.php?page=rs-history-permintaan" class="btn btn-success btn-small" title="Konfirmasi penerimaan darah di Riwayat Permintaan">
+                                                    <i data-lucide="check-circle"></i> <span>Konfirmasi</span>
+                                                </a>
+                                            <?php endif; ?>
+                                            <button type="button" class="btn btn-outline-sidora btn-small" onclick='openDetailPermintaanModal(<?= htmlspecialchars(json_encode($detailPermintaan), ENT_QUOTES, "UTF-8") ?>)'>
+                                                <i data-lucide="eye"></i> <span>Detail</span>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             <?php endforeach; else: ?>
@@ -298,6 +311,7 @@ Tidak Tersedia
         function openDetailPermintaanModal(data) {
             let statusClass = 'badge-warning';
             if(data.status === 'Disetujui' || data.status === 'Dikirim') statusClass = 'badge-success';
+            else if(data.status === 'Diterima') statusClass = 'badge-diterima';
             else if(data.status === 'Ditolak') statusClass = 'badge-danger';
 
             const rawPrio = (data.prioritas || 'biasa').toLowerCase().trim();
@@ -339,7 +353,7 @@ Tidak Tersedia
             } else if (data.status === 'Dikirim') {
                 html += `
                     <div class="detail-item">
-                        <p class="detail-label">Kurir</p>
+                        <p class="detail-label">Kurir / Pengantar</p>
                         <p class="detail-value">${data.kurir || '-'}</p>
                     </div>
                     <div class="detail-item">
@@ -347,8 +361,37 @@ Tidak Tersedia
                         <p class="detail-value">${data.tanggal_kirim || '-'}</p>
                     </div>
                 `;
+            } else if (data.status === 'Diterima') {
+                html += `
+                    <div class="detail-item">
+                        <p class="detail-label">Kurir Pengantar</p>
+                        <p class="detail-value">${data.kurir || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Tanggal Dikirim</p>
+                        <p class="detail-value">${data.tanggal_kirim || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Tanggal Diterima</p>
+                        <p class="detail-value">${data.tanggal_terima || '-'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <p class="detail-label">Penerima di RS</p>
+                        <p class="detail-value">${data.penerima || '-'}</p>
+                    </div>
+                `;
             }
             html += `</div>`;
+
+            if (data.status === 'Dikirim') {
+                html += `
+                    <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end;">
+                        <a href="index.php?page=rs-history-permintaan" class="btn btn-success">
+                            <i data-lucide="check-circle"></i> <span>Konfirmasi Penerimaan Darah</span>
+                        </a>
+                    </div>
+                `;
+            }
             
             document.getElementById('detailBodyRS').innerHTML = html;
             document.getElementById('detailPermintaanModal').classList.add('active');

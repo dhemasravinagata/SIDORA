@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="{{ asset('/') }}">
     <title>Kelola User - SIDORA Admin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -127,33 +128,35 @@
 
             <?php render_alerts(); ?>
 
-            <form id="filterFormUser" class="filter-section">
+            <div id="filterFormUser" class="card filter-card" style="margin-bottom: var(--spacing-xl);">
                 <div class="filter-group">
-                    <label for="filterTarget">Filter Data</label>
+                    <label for="filterTarget">Tipe User</label>
                     <select id="filterTarget">
+                        <option value="semua">Semua Tipe User</option>
                         <option value="rumahsakit">Rumah Sakit</option>
                         <option value="petugas">Petugas</option>
                     </select>
                 </div>
 
                 <div class="filter-group" style="flex: 2; min-width: 200px;">
-                    <label for="searchUser">Cari Rumah Sakit</label>
-                    <input type="text" id="searchUser" placeholder="Nama, email, kontak, atau alamat...">
+                    <label for="searchUser">Cari User</label>
+                    <input type="text" id="searchUser" placeholder="Nama, email, telepon, atau alamat...">
                 </div>
 
                 <div class="filter-group">
                     <label for="filterStatus">Status</label>
                     <select id="filterStatus">
                         <option value="">Semua Status</option>
-                        <option value="terverifikasi">Terverifikasi</option>
-                        <option value="menunggu verifikasi">Menunggu Verifikasi</option>
+                        <option value="aktif">Aktif / Terverifikasi</option>
+                        <option value="menunggu">Menunggu Verifikasi</option>
+                        <option value="nonaktif">Non-aktif / Ditolak</option>
                     </select>
                 </div>
 
                 <button type="button" class="btn btn-outline-gray" id="resetUserFilter"><i data-lucide="rotate-ccw"></i> <span>Reset</span></button>
-            </form>
+            </div>
 
-            <div class="table-container">
+            <div class="table-container" id="containerRumahSakit">
                 <div class="table-header">
                     <h3>Verifikasi Rumah Sakit</h3>
                     <div class="table-actions">
@@ -202,7 +205,7 @@
                                     ]);
                                     $alamatLengkap = $alamatParts ? implode(', ', $alamatParts) : '-';
                                 ?>
-                                <tr>
+                                <tr data-status="<?= htmlspecialchars($rsStatus) ?>" data-label="<?= htmlspecialchars(strtolower($rsLabel)) ?>">
                                     <td><?= $noRs++ ?></td>
                                     <td>
                                         <strong><?= htmlspecialchars($rs['name'] ?? '-') ?></strong><br>
@@ -222,6 +225,7 @@
                                         <div class="action-buttons">
                                             <?php if ($rsStatus === 'aktif'): ?>
                                                 <form method="POST" action="index.php?page=admin-hapus-rs" style="display:inline;">
+                                                    @csrf
                                                     <input type="hidden" name="id" value="<?= (int)$rs['id'] ?>">
                                                     <button type="submit" class="btn btn-danger btn-small" onclick="return confirm('Hapus akun rumah sakit ini?');">
                                                         <i data-lucide="trash-2"></i> <span>Hapus</span>
@@ -229,6 +233,7 @@
                                                 </form>
                                             <?php else: ?>
                                                 <form method="POST" action="index.php?page=admin-approve-rs" style="display:inline;">
+                                                    @csrf
                                                     <input type="hidden" name="id" value="<?= (int)$rs['id'] ?>">
                                                     <input type="hidden" name="status" value="aktif">
                                                     <button type="submit" class="btn btn-success btn-small" onclick="return confirm('Verifikasi dan aktifkan rumah sakit ini?');">
@@ -236,6 +241,7 @@
                                                     </button>
                                                 </form>
                                                 <form method="POST" action="index.php?page=admin-approve-rs" style="display:inline;">
+                                                    @csrf
                                                     <input type="hidden" name="id" value="<?= (int)$rs['id'] ?>">
                                                     <input type="hidden" name="status" value="ditolak">
                                                     <button type="submit" class="btn btn-danger btn-small" onclick="return confirm('Tolak verifikasi rumah sakit ini?');">
@@ -254,7 +260,7 @@
                 </div>
             </div>
 
-            <div class="table-container">
+            <div class="table-container" id="containerPetugas">
                 <div class="table-header">
                     <h3>Daftar Petugas</h3>
                     <div class="table-actions">
@@ -277,7 +283,7 @@
                         </thead>
                         <tbody>
                             <?php if (!empty($petugasList)): $no = 1; foreach ($petugasList as $user): ?>
-                                <tr>
+                                <tr data-status="<?= htmlspecialchars(strtolower($user['status'] ?? 'aktif')) ?>">
                                     <td><?= $no++ ?></td>
                                     <td><?= htmlspecialchars($user['name']) ?></td>
                                     <td><?= htmlspecialchars($user['email']) ?></td>
@@ -315,6 +321,7 @@
                 <button type="button" class="modal-close" onclick="closeModal('editPetugasModal')">&times;</button>
             </div>
             <form method="POST" action="index.php?page=admin-edit-petugas">
+                @csrf
                 <div class="modal-body">
                     <input type="hidden" name="id" id="editId">
                     <div class="form-row">
@@ -369,6 +376,7 @@
                 <button type="button" class="modal-close" onclick="closeModal('hapusPetugasModal')">&times;</button>
             </div>
             <form method="POST" action="index.php?page=admin-hapus-petugas">
+                @csrf
                 <div class="modal-body">
                     <input type="hidden" name="id" id="hapusPetugasId">
                     <p>Apakah Anda yakin ingin menghapus petugas ini? Tindakan ini tidak dapat dibatalkan.</p>
@@ -405,80 +413,175 @@
         }
 
         const statusOptions = {
+            semua: [
+                { value: '', label: 'Semua Status' },
+                { value: 'aktif', label: 'Aktif / Terverifikasi' },
+                { value: 'menunggu', label: 'Menunggu Verifikasi' },
+                { value: 'nonaktif', label: 'Non-aktif / Ditolak' },
+            ],
             rumahsakit: [
                 { value: '', label: 'Semua Status' },
-                { value: 'terverifikasi', label: 'Terverifikasi' },
-                { value: 'menunggu verifikasi', label: 'Menunggu Verifikasi' },
+                { value: 'aktif', label: 'Terverifikasi (Aktif)' },
+                { value: 'menunggu', label: 'Menunggu Verifikasi (Pending)' },
+                { value: 'ditolak', label: 'Ditolak' },
+                { value: 'nonaktif', label: 'Non-aktif' },
             ],
             petugas: [
                 { value: '', label: 'Semua Status' },
                 { value: 'aktif', label: 'Aktif' },
-                { value: 'non-aktif', label: 'Non-aktif' },
+                { value: 'nonaktif', label: 'Non-aktif' },
             ],
         };
 
-        function normalizeStatus(text) {
-            return text.toLowerCase().replace(/\s+/g, ' ').trim();
-        }
-
         function updateUserFilterLabels() {
-            const target = document.getElementById('filterTarget').value;
-            const searchLabel = document.querySelector('label[for="searchUser"]');
+            const targetSelect = document.getElementById('filterTarget');
+            const target = (targetSelect ? targetSelect.value : 'semua') || 'semua';
             const searchInput = document.getElementById('searchUser');
             const statusSelect = document.getElementById('filterStatus');
 
-            searchLabel.textContent = target === 'rumahsakit' ? 'Cari Rumah Sakit' : 'Cari Petugas';
-            searchInput.placeholder = target === 'rumahsakit'
-                ? 'Nama, email, kontak, atau alamat...'
-                : 'Nama, email, atau telepon...';
+            if (searchInput) {
+                if (target === 'rumahsakit') {
+                    searchInput.placeholder = 'Nama rumah sakit, email, kontak, alamat...';
+                } else if (target === 'petugas') {
+                    searchInput.placeholder = 'Nama petugas, email, username, no telepon...';
+                } else {
+                    searchInput.placeholder = 'Nama, email, telepon, atau alamat...';
+                }
+            }
 
-            statusSelect.innerHTML = statusOptions[target]
-                .map(option => `<option value="${option.value}">${option.label}</option>`)
-                .join('');
-        }
-
-        function resetTableRows(tableId) {
-            document.querySelectorAll(`#${tableId} tbody tr`).forEach(row => {
-                row.style.display = '';
-            });
+            if (statusSelect && statusOptions[target]) {
+                const currentVal = statusSelect.value;
+                statusSelect.innerHTML = statusOptions[target]
+                    .map(opt => `<option value="${opt.value}">${opt.label}</option>`)
+                    .join('');
+                if (statusOptions[target].some(opt => opt.value === currentVal)) {
+                    statusSelect.value = currentVal;
+                } else {
+                    statusSelect.value = '';
+                }
+            }
         }
 
         function filterUserTable() {
-            const target = document.getElementById('filterTarget').value;
-            const tableId = target === 'rumahsakit' ? 'tabelRumahSakit' : 'tabelPetugas';
-            const otherTableId = target === 'rumahsakit' ? 'tabelPetugas' : 'tabelRumahSakit';
-            const searchVal = document.getElementById('searchUser').value.toLowerCase().trim();
-            const statusVal = document.getElementById('filterStatus').value;
+            const targetSelect = document.getElementById('filterTarget');
+            const target = targetSelect ? targetSelect.value : 'semua';
+            const searchInput = document.getElementById('searchUser');
+            const searchVal = searchInput ? searchInput.value.toLowerCase().trim() : '';
+            const statusSelect = document.getElementById('filterStatus');
+            const statusVal = statusSelect ? statusSelect.value.toLowerCase().trim() : '';
 
-            resetTableRows(otherTableId);
+            const containerRS = document.getElementById('containerRumahSakit');
+            const containerPetugas = document.getElementById('containerPetugas');
 
-            document.querySelectorAll(`#${tableId} tbody tr`).forEach(row => {
-                if (row.cells.length <= 1) return;
+            // Switch container display
+            if (target === 'rumahsakit') {
+                if (containerRS) containerRS.style.display = '';
+                if (containerPetugas) containerPetugas.style.display = 'none';
+            } else if (target === 'petugas') {
+                if (containerRS) containerRS.style.display = 'none';
+                if (containerPetugas) containerPetugas.style.display = '';
+            } else {
+                if (containerRS) containerRS.style.display = '';
+                if (containerPetugas) containerPetugas.style.display = '';
+            }
 
-                const text = row.textContent.toLowerCase();
-                const statusBadge = row.querySelector('.badge');
-                const statusText = statusBadge ? normalizeStatus(statusBadge.textContent) : '';
-                const matchSearch = searchVal === '' || text.includes(searchVal);
-                const matchStatus = statusVal === '' || statusText === statusVal;
+            // Filter Rumah Sakit Table
+            if (containerRS && containerRS.style.display !== 'none') {
+                document.querySelectorAll('#tabelRumahSakit tbody tr').forEach(row => {
+                    if (row.cells.length <= 1) return;
 
-                row.style.display = (matchSearch && matchStatus) ? '' : 'none';
-            });
+                    const text = row.textContent.toLowerCase();
+                    const rowStatus = (row.getAttribute('data-status') || '').toLowerCase().trim();
+                    const rowLabel = (row.getAttribute('data-label') || '').toLowerCase().trim();
+
+                    const matchSearch = searchVal === '' || text.includes(searchVal);
+                    
+                    let matchStatus = false;
+                    if (!statusVal) {
+                        matchStatus = true;
+                    } else if (statusVal === 'aktif' || statusVal === 'terverifikasi') {
+                        matchStatus = (rowStatus === 'aktif' || rowLabel.includes('terverifikasi'));
+                    } else if (statusVal === 'menunggu' || statusVal === 'pending') {
+                        matchStatus = (rowStatus === 'pending' || rowLabel.includes('menunggu'));
+                    } else if (statusVal === 'ditolak') {
+                        matchStatus = (rowStatus === 'ditolak' || rowLabel.includes('ditolak'));
+                    } else if (statusVal === 'nonaktif' || statusVal === 'non-aktif') {
+                        matchStatus = (rowStatus === 'nonaktif' || rowStatus === 'non-aktif' || rowLabel.includes('non-aktif') || rowLabel.includes('ditolak'));
+                    } else {
+                        matchStatus = (rowStatus === statusVal || rowLabel.includes(statusVal));
+                    }
+
+                    row.style.display = (matchSearch && matchStatus) ? '' : 'none';
+                });
+            }
+
+            // Filter Petugas Table
+            if (containerPetugas && containerPetugas.style.display !== 'none') {
+                document.querySelectorAll('#tabelPetugas tbody tr').forEach(row => {
+                    if (row.cells.length <= 1) return;
+
+                    const text = row.textContent.toLowerCase();
+                    const rowStatus = (row.getAttribute('data-status') || '').toLowerCase().trim();
+
+                    const matchSearch = searchVal === '' || text.includes(searchVal);
+                    
+                    let matchStatus = false;
+                    if (!statusVal) {
+                        matchStatus = true;
+                    } else if (statusVal === 'aktif' || statusVal === 'terverifikasi') {
+                        matchStatus = (rowStatus === 'aktif');
+                    } else if (statusVal === 'nonaktif' || statusVal === 'non-aktif') {
+                        matchStatus = (rowStatus === 'nonaktif' || rowStatus === 'non-aktif');
+                    } else {
+                        matchStatus = false;
+                    }
+
+                    row.style.display = (matchSearch && matchStatus) ? '' : 'none';
+                });
+            }
         }
 
-        document.getElementById('filterTarget').addEventListener('change', function() {
-            document.getElementById('searchUser').value = '';
+        document.addEventListener('DOMContentLoaded', function() {
+            const targetSelect = document.getElementById('filterTarget');
+            const searchInput = document.getElementById('searchUser');
+            const statusSelect = document.getElementById('filterStatus');
+            const resetBtn = document.getElementById('resetUserFilter');
+
+            if (targetSelect) {
+                targetSelect.addEventListener('change', function() {
+                    updateUserFilterLabels();
+                    filterUserTable();
+                });
+            }
+
+            if (searchInput) {
+                searchInput.addEventListener('input', filterUserTable);
+                searchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        filterUserTable();
+                    }
+                });
+            }
+
+            if (statusSelect) {
+                statusSelect.addEventListener('change', filterUserTable);
+            }
+
+            if (resetBtn) {
+                resetBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (targetSelect) targetSelect.value = 'semua';
+                    if (searchInput) searchInput.value = '';
+                    updateUserFilterLabels();
+                    if (statusSelect) statusSelect.value = '';
+                    filterUserTable();
+                });
+            }
+
             updateUserFilterLabels();
             filterUserTable();
         });
-        document.getElementById('searchUser').addEventListener('input', filterUserTable);
-        document.getElementById('filterStatus').addEventListener('change', filterUserTable);
-        document.getElementById('resetUserFilter').addEventListener('click', function() {
-            document.getElementById('searchUser').value = '';
-            document.getElementById('filterStatus').value = '';
-            filterUserTable();
-        });
-
-        updateUserFilterLabels();
     </script>
 
     <script src="assets/vendor/lucide/lucide.min.js"></script>

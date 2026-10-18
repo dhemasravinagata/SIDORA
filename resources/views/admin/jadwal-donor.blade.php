@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="{{ asset('/') }}">
     <title>Jadwal Donor - SIDORA Admin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -131,6 +132,8 @@
                 </div>
             </div>
 
+            <?php render_alerts(); ?>
+
             <div class="dashboard-grid grid-3-cols">
                 <div class="stat-card">
                     <div class="stat-content">
@@ -160,8 +163,21 @@
 
 
 
+            <div class="card filter-card" style="margin-bottom: var(--spacing-xl);">
+                <div class="filter-group" style="flex: 2; min-width: 200px;">
+                    <label for="searchJadwal">Cari Jadwal / Lokasi</label>
+                    <input type="text" id="searchJadwal" placeholder="Nama lokasi, alamat, atau penyelenggara...">
+                </div>
+                <div class="filter-group">
+                    <label for="filterTanggal">Tanggal</label>
+                    <input type="date" id="filterTanggal">
+                </div>
+                <button type="button" class="btn btn-outline-gray" id="resetJadwalBtn"><i data-lucide="rotate-ccw"></i> <span>Reset</span></button>
+            </div>
+
+            <div class="jadwal-list-wrapper">
                 <?php if (!empty($jadwalList)): foreach ($jadwalList as $jadwal): ?>
-                <div class="jadwal-card">
+                <div class="jadwal-card" data-tanggal="<?= htmlspecialchars($jadwal['tanggal'] ?? '') ?>">
                     <div class="jadwal-info">
                         <h4><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> <?= htmlspecialchars($jadwal['lokasi'] ?? 'Lokasi') ?></h4>
                         <p><strong><?= htmlspecialchars($jadwal['tanggal'] ?? '-') ?></strong></p>
@@ -196,6 +212,7 @@
 
     
     <form id="hapusJadwalForm" method="POST" action="index.php?page=admin-hapus-jadwal" style="display:none;">
+        @csrf
         <input type="hidden" name="id" id="hapusJadwalId">
     </form>
 
@@ -218,6 +235,7 @@
                 <button type="button" class="modal-close" onclick="closeModal('editJadwalModal')">&times;</button>
             </div>
             <form method="POST" action="index.php?page=admin-edit-jadwal">
+                @csrf
                 <div class="modal-body">
                     <input type="hidden" name="id" id="editJadwalId">
                     <div class="edit-jadwal-grid">
@@ -330,6 +348,47 @@
             document.getElementById('detailJadwalBody').innerHTML = html;
             openModal('detailJadwalModal');
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchJadwal');
+            const tanggalInput = document.getElementById('filterTanggal');
+            const resetBtn = document.getElementById('resetJadwalBtn');
+            const cards = document.querySelectorAll('.jadwal-card');
+
+            function filterJadwal() {
+                const searchVal = searchInput ? searchInput.value.toLowerCase().trim() : '';
+                const tanggalVal = tanggalInput ? tanggalInput.value.trim() : '';
+
+                cards.forEach(card => {
+                    const text = card.textContent.toLowerCase();
+                    const cardTanggal = (card.getAttribute('data-tanggal') || '').trim();
+
+                    const matchSearch = searchVal === '' || text.includes(searchVal);
+                    const matchTanggal = tanggalVal === '' || cardTanggal === tanggalVal;
+
+                    card.style.display = (matchSearch && matchTanggal) ? '' : 'none';
+                });
+            }
+
+            if (searchInput) {
+                searchInput.addEventListener('input', filterJadwal);
+                searchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        filterJadwal();
+                    }
+                });
+            }
+            if (tanggalInput) tanggalInput.addEventListener('change', filterJadwal);
+            if (resetBtn) {
+                resetBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (searchInput) searchInput.value = '';
+                    if (tanggalInput) tanggalInput.value = '';
+                    filterJadwal();
+                });
+            }
+        });
     </script>
 
     <script src="assets/vendor/lucide/lucide.min.js"></script>

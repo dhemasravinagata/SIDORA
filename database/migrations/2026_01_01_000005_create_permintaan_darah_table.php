@@ -11,13 +11,15 @@ return new class extends Migration
         Schema::create('permintaan_darah', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->enum('status', ['Pending', 'Disetujui', 'Ditolak', 'Dikirim'])->default('Pending');
+            $table->enum('status', ['Pending', 'Disetujui', 'Ditolak', 'Dikirim', 'Diterima'])->default('Pending');
             $table->string('prioritas', 50)->default('Biasa');
             $table->text('keterangan')->nullable();
             $table->text('alasan_tolak')->nullable();
             $table->date('tanggal_tolak')->nullable();
             $table->string('kurir', 191)->nullable();
             $table->date('tanggal_kirim')->nullable();
+            $table->date('tanggal_terima')->nullable();
+            $table->string('penerima', 191)->nullable();
             $table->timestamps();
         });
     }

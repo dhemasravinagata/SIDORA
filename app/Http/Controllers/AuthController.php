@@ -46,8 +46,8 @@ class AuthController extends Controller
         $loginIdentifier = trim($request->input('email'));
         $password        = $request->input('password');
 
-        $user = User::where('email', $loginIdentifier)
-            ->orWhere('username', $loginIdentifier)
+        $user = User::whereRaw('LOWER(email) = ?', [strtolower($loginIdentifier)])
+            ->orWhereRaw('LOWER(username) = ?', [strtolower($loginIdentifier)])
             ->first();
 
         if ($user && (Hash::check($password, $user->password) || $password === $user->password)) {
@@ -59,9 +59,16 @@ class AuthController extends Controller
 
             if ($user->role === 'rumahsakit' && $user->status !== 'aktif') {
                 Log::warning("Percobaan login akun Rumah Sakit yang belum diverifikasi: {$loginIdentifier}");
+                $namaRs = $user->name ?? $user->username;
+                if ($user->status === 'ditolak') {
+                    return back()
+                        ->withInput($request->only('email'))
+                        ->with('error', "Pendaftaran akun Rumah Sakit '{$namaRs}' telah ditolak oleh Administrator. Silakan hubungi admin SIDORA untuk informasi lebih lanjut.");
+                }
+
                 return back()
                     ->withInput($request->only('email'))
-                    ->with('warning', 'Akun rumah sakit belum aktif. Mohon menunggu verifikasi dan persetujuan dari admin.');
+                    ->with('warning', "Akun Rumah Sakit '{$namaRs}' belum aktif karena masih dalam tahap verifikasi oleh Administrator SIDORA. Mohon menunggu proses verifikasi dan persetujuan admin sebelum dapat masuk.");
             }
 
             if ($user->status === 'nonaktif' || $user->status === 'ditolak') {
@@ -93,9 +100,20 @@ class AuthController extends Controller
 
     public function registerRs(Request $request)
     {
+        if ($request->has('email')) {
+            $request->merge(['email' => strtolower(trim((string) $request->input('email')))]);
+        }
+        if ($request->has('username')) {
+            $rawUsername = trim((string) $request->input('username'));
+            $request->merge(['username' => $rawUsername !== '' ? $rawUsername : null]);
+        }
+        if ($request->has('nama_rs')) {
+            $request->merge(['nama_rs' => trim((string) $request->input('nama_rs'))]);
+        }
+
         $validator = Validator::make($request->all(), [
             'nama_rs'   => 'required|string|min:3|max:150',
-            'email'     => 'required|email|max:150|unique:users,email',
+            'email'     => 'required|string|email:rfc,filter|max:150|unique:users,email',
             'password'  => 'required|string|min:6',
             'username'  => 'nullable|string|min:3|max:50|unique:users,username',
             'telepon'   => 'nullable|string|min:6|max:25',
@@ -109,12 +127,13 @@ class AuthController extends Controller
             'no_izin'   => 'nullable|string|max:100',
         ], [
             'nama_rs.required'  => 'Nama Rumah Sakit wajib diisi.',
+            'nama_rs.min'       => 'Nama Rumah Sakit minimal 3 karakter.',
             'email.required'    => 'Email resmi Rumah Sakit wajib diisi.',
-            'email.email'       => 'Format email tidak valid.',
-            'email.unique'      => 'Email ini sudah terdaftar dalam sistem.',
+            'email.email'       => 'Format email tidak valid (contoh: rumahsakit@gmail.com).',
+            'email.unique'      => 'Email ":input" sudah terdaftar dalam sistem SIDORA. Silakan gunakan email lain atau login jika sudah memiliki akun.',
             'password.required' => 'Password wajib diisi.',
             'password.min'      => 'Password minimal harus 6 karakter.',
-            'username.unique'   => 'Username sudah digunakan oleh akun lain.',
+            'username.unique'   => 'Username ":input" sudah digunakan oleh akun lain.',
         ]);
 
         if ($validator->fails()) {

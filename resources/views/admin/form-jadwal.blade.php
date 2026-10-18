@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="{{ asset('/') }}">
     <title>Form Jadwal Donor - SIDORA Admin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -84,7 +85,10 @@
                 </div>
             </div>
 
+            <?php render_alerts(); ?>
+
             <form action="index.php?page=admin-form-jadwal-process" method="POST" class="card">
+                @csrf
                 <h3 style="margin-top: 0;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Informasi Jadwal Donor</h3>
 
                 <div class="form-group">
@@ -92,15 +96,6 @@
                     <input type="text" name="judul" class="form-control" placeholder="Contoh: Donor Darah Rutin Bulan April" required>
                 </div>
 
-                <div class="form-group">
-                    <label>Status Kegiatan *</label>
-                    <select name="status" class="form-control" required>
-                        <option value="Akan Datang">Akan Datang</option>
-                        <option value="Sedang Berlangsung">Sedang Berlangsung</option>
-                        <option value="Selesai">Selesai</option>
-                        <option value="Dibatalkan">Dibatalkan</option>
-                    </select>
-                </div>
 
                 <div class="form-group">
                     <label>Deskripsi / Catatan Kegiatan</label>
